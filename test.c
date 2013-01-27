@@ -1,3 +1,9 @@
+/*
+ * for example: 
+ * 汉字“度”的gb2312 EUC-CN 编码为0xB6C8, 
+ * 16*16字库gb2312.hzk, 要生成“度”的24位的位图，输入：
+ * ./test ./gb2312.hzk 0xb6c8 ./b6c8.bmp 24
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -45,7 +51,10 @@ int main(int argc, char **argv)
 		perror("mmap");
 		exit(1);
 	}
-	offset = atoi(argv[2]);
+	offset = strtol(argv[2], NULL, 0);
+	offset = ((offset / 0x100 - 0xA1) * 94) + (offset % 0x100 - 0xA1);
+	offset *= 32;
+	printf("offset = %d\n", offset);
 	if ((save_fp = fopen(argv[3], "wb")) == NULL) {
 		perror("fopen");
 		exit(1);
