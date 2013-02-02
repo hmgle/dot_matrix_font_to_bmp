@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "debug_log.h"
 #include "dot_matrix_font_to_bmp.h"
 
 void 
@@ -20,12 +21,25 @@ set_header(bmp_file_t *pbmp_f,
 	pbmp_f->dib_h.compression = 0;
 	rowsize = (bits_per_pix * width + 31) / 32 * 4; /* 4字节对齐 */
 	pbmp_f->dib_h.image_size = rowsize * height;
-	printf("%s %d pbmp_f->dib_h.image_size = %d\n", __func__, __LINE__, pbmp_f->dib_h.image_size);
+	debug_print("pbmp_f->dib_h.image_size = %d", pbmp_f->dib_h.image_size);
 	pbmp_f->dib_h.x_pix_per_meter = 0;
 	pbmp_f->dib_h.y_pix_per_meter = 0;
 	pbmp_f->dib_h.colors_in_colortable = 0;
 	pbmp_f->dib_h.important_color_count = 0;
 	pbmp_f->bmp_h.file_size = pbmp_f->bmp_h.offset + pbmp_f->dib_h.image_size;
+}
+
+void 
+get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_header_t *dib_header)
+{
+	bmp_header->magic[0] = pbmp_f->bmp_h.magic[0];
+	bmp_header->magic[1] = pbmp_f->bmp_h.magic[1];
+	bmp_header->file_size = pbmp_f->bmp_h.file_size;
+	bmp_header->reserved1 = pbmp_f->bmp_h.reserved1;
+	bmp_header->reserved2 = pbmp_f->bmp_h.reserved2;
+	bmp_header->offset = pbmp_f->bmp_h.offset;
+
+	dib_header->dib_header_size = pbmp_f->dib_h.dib_header_size;
 }
 
 void 
@@ -106,4 +120,32 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 			 bits_per_pix);
 		ptrbmpdata += rowsize;
 	}
+}
+
+uint32_t 
+gb2312code_to_fontoffset(uint32_t gb2312code)
+{
+	uint32_t fontoffset;
+
+#if 0
+	fontoffset = (gb2312code / 0x100 - 0xA1) * 94 
+		     + (gb2312code % 0x100 - 0xA1);
+#else
+	fontoffset = (gb2312code % 0x100 - 0xA1) * 94
+		     + (gb2312code / 0x100 - 0xA1);
+#endif
+	fontoffset *= 32;
+	return fontoffset;
+}
+
+/*
+ * 位图水平合并
+ */
+bmp_file_t *
+bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
+{
+	memset(&dst->bmp_h, 0, sizeof(struct bmp_file_header));
+	memset(&dst->dib_h, 0, sizeof(struct bmp_file));
+
+	return dst;
 }

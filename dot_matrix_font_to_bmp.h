@@ -33,7 +33,10 @@ typedef struct bmp_file {
 } __attribute__ ((packed)) bmp_file_t;
 
 void set_header(bmp_file_t *pbmp_f, uint32_t width, uint32_t height, uint16_t bits_per_pix);
+void get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_header_t *dib_header);
 void conv_row(const uint8_t *ptrfontdata, uint32_t width, uint8_t *pdest, uint16_t bits_per_pix);
 void fontdata2bmp(const uint8_t *ptrfontdata, uint32_t width, uint32_t hegiht, bmp_file_t *ptrbmp, uint16_t bits_per_pix);
+uint32_t gb2312code_to_fontoffset(uint32_t gb2312code);
 
+bmp_file_t * bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
 #endif

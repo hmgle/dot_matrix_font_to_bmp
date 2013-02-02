@@ -1,3 +1,5 @@
 *.o
 *.bmp
 test
+gb2312tobmp
+utf8togb2312
