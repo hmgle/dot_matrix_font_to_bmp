@@ -56,15 +56,9 @@ conv_row(const uint8_t *ptrfontdata,
 
 	ptmp = pdest;
 	for (i = 0; i < width; i++) {
-#if 0
-		char_num = i / 8;
-		char_bit = i % 8;
-		bit = ptrfontdata[char_num] & (1 << char_bit);
-#else
 		char_num = i / 8;
 		char_bit = 7 - i % 8;
 		bit = ptrfontdata[char_num] & (1 << char_bit);
-#endif
 		if (bit) {
 			switch (bits_per_pix) {
 			case 1:
@@ -127,13 +121,8 @@ gb2312code_to_fontoffset(uint32_t gb2312code)
 {
 	uint32_t fontoffset;
 
-#if 0
-	fontoffset = (gb2312code / 0x100 - 0xA1) * 94 
-		     + (gb2312code % 0x100 - 0xA1);
-#else
 	fontoffset = (gb2312code % 0x100 - 0xA1) * 94
 		     + (gb2312code / 0x100 - 0xA1);
-#endif
 	fontoffset *= 32;
 	return fontoffset;
 }
@@ -144,8 +133,58 @@ gb2312code_to_fontoffset(uint32_t gb2312code)
 bmp_file_t *
 bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 {
-	memset(&dst->bmp_h, 0, sizeof(struct bmp_file_header));
-	memset(&dst->dib_h, 0, sizeof(struct bmp_file));
+	int i;
+	uint32_t rowsize;
+	uint32_t rowsize_src1;
+	uint32_t rowsize_src2;
+	uint32_t row_length_src1;
+	uint32_t row_length_src2;
+	uint8_t *ptrbmpdata;
 
+	debug_print("dst->pdata is %#x", dst->pdata);
+	memset(&dst->bmp_h, 0, sizeof(struct bmp_file_header));
+	memset(&dst->dib_h, 0, sizeof(struct dib_header));
+
+	debug_print("dst->pdata is %#x", dst->pdata);
+	dst->bmp_h.magic[0] = 'B';
+	dst->bmp_h.magic[1] = 'M';
+	dst->bmp_h.offset = sizeof(bmp_file_header_t) + sizeof(dib_header_t);
+	dst->dib_h.dib_header_size = sizeof(dib_header_t);
+	dst->dib_h.width = src1->dib_h.width + src2->dib_h.width;
+	dst->dib_h.height = src1->dib_h.height;
+	dst->dib_h.planes = 1;
+	dst->dib_h.bits_per_pix = src1->dib_h.bits_per_pix;
+	dst->dib_h.compression = 0;
+
+	rowsize = (dst->dib_h.bits_per_pix * dst->dib_h.width + 31) / 32 * 4;
+	dst->dib_h.image_size = rowsize * dst->dib_h.height;
+	dst->dib_h.x_pix_per_meter = 0;
+	dst->dib_h.y_pix_per_meter = 0;
+	dst->dib_h.colors_in_colortable = 0;
+	dst->dib_h.important_color_count = 0;
+	dst->bmp_h.file_size = dst->bmp_h.offset + dst->dib_h.image_size;
+	debug_print("dst->bmp_h.file_size = %d", dst->bmp_h.file_size);
+
+	rowsize_src1 = (src1->dib_h.bits_per_pix * src1->dib_h.width + 31) / 32 * 4;
+	rowsize_src2 = (src2->dib_h.bits_per_pix * src2->dib_h.width + 31) / 32 * 4;
+	row_length_src1 = src1->dib_h.width * (src1->dib_h.bits_per_pix / 8);
+	row_length_src2 = src2->dib_h.width * (src1->dib_h.bits_per_pix / 8);
+
+	ptrbmpdata = dst->pdata;
+	for (i = 0; i < dst->dib_h.height; i++) {
+		debug_print("row_length_src1 = %d", row_length_src1);
+		memcpy(ptrbmpdata, 
+			src1->pdata + i * rowsize_src1, 
+			row_length_src1);
+		memcpy(ptrbmpdata + row_length_src1, 
+			src2->pdata + i * rowsize_src2, 
+			row_length_src2);
+		if (rowsize > row_length_src1 + row_length_src2)
+			memset(ptrbmpdata + row_length_src1 + row_length_src2,
+				0,
+				rowsize - row_length_src1 - row_length_src2);
+
+		ptrbmpdata += rowsize;
+	}
 	return dst;
 }

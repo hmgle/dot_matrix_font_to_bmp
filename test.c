@@ -34,6 +34,7 @@ int main(int argc, char **argv)
 
 	if (argc < 5) {
 		show_usage(argv[0]);
+		exit(1);
 	}
 	font_fd = open(argv[1], O_RDONLY);
 	if (font_fd < 0) {
