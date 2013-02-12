@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 	uint32_t image_size;
 	int ret;
 	char *pret;
+	int i;
 
 	while ((opt = getopt(argc, argv, "d:")) != -1) {
 		switch (opt) {
@@ -59,30 +60,31 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[0]);
-	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[0]);
-	debug_print("offset = %#x", offset);
-	memset(&bmp, 0, sizeof(bmp));
-	set_header(&bmp, 16, 16, bits_per_pix);
-	image_size = bmp.dib_h.image_size;
-	bmp.pdata = malloc(image_size);
-	memset(bmp.pdata, 0, image_size);
-	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix);
+	for (i = 0; gb2312buf[2 * i] > 0xA0 && gb2312buf[2 * i]  < 0xff; i++) {
+		offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[i]);
+		debug_print("offset = %#x", offset);
+		memset(&bmp, 0, sizeof(bmp));
+		set_header(&bmp, 16, 16, bits_per_pix);
+		image_size = bmp.dib_h.image_size;
+		bmp.pdata = malloc(image_size);
+		memset(bmp.pdata, 0, image_size);
+		fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix);
 
-	ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);
-	if (ret < 0) {
-		perror("fwrite");
-		exit(1);
-	}
-	ret = fwrite(&bmp.dib_h, sizeof(dib_header_t), 1, stdout);
-	if (ret < 0) {
-		perror("fwrite");
-		exit(1);
-	}
-	ret = fwrite(bmp.pdata, sizeof(uint8_t), image_size, stdout);
-	if (ret < 0) {
-		perror("fwrite");
-		exit(1);
+		ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);
+		if (ret < 0) {
+			perror("fwrite");
+			exit(1);
+		}
+		ret = fwrite(&bmp.dib_h, sizeof(dib_header_t), 1, stdout);
+		if (ret < 0) {
+			perror("fwrite");
+			exit(1);
+		}
+		ret = fwrite(bmp.pdata, sizeof(uint8_t), image_size, stdout);
+		if (ret < 0) {
+			perror("fwrite");
+			exit(1);
+		}
 	}
 
 	if (bmp.pdata) {

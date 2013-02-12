@@ -2,5 +2,7 @@
 *.bmp
 test
 gb2312tobmp
+gb2312tobmps
 utf8togb2312
+bmps2bmp
 test_bmp_h_combin
