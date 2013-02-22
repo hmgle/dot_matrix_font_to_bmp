@@ -107,7 +107,12 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 	ptrbmpdata = ptrbmp->pdata;
 	set_header(ptrbmp, width, height, bits_per_pix);
 	rowsize = (bits_per_pix * width + 31) / 32 * 4; /* 4字节对齐 */
-	for (i = 0; i < height; i++) {
+#if 0
+	for (i = 0; i < height; i++) /* 倒立的位图 */
+#else
+	for (i = height - 1; i >= 0; i--) /* 正立的位图 */
+#endif
+	{
 		conv_row(ptrfontdata + (width + 7) / 8 * i, 
 			 width, 
 			 ptrbmpdata,
