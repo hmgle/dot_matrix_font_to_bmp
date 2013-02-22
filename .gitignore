@@ -1,5 +1,6 @@
 *.o
 *.bmp
+*.bak
 test
 gb2312tobmp
 gb2312tobmps
