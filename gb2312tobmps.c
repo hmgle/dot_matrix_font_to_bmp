@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
 			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
 			i += 2;
-		} else if (gb2312buf[i] > 0x20 && gb2312buf[i] < 0x80) {
+		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
 			offset = gb2312code_to_fontoffset(0xa1a3 + 0x100 * (gb2312buf[i] - 0x21));
 			i++;
 		} else

@@ -10,6 +10,9 @@
 
     ./chinese2bmp.sh "字符生成位图测试0x16v1.0.0" > ./test.bmp
 
+支持中间混杂了空格， 如：
+
+    ./chinese2bmp.sh "后面有1个空格   前面有1个空格" > ./test.bmp
 
 
 ##  用途
