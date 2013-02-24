@@ -60,8 +60,17 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	for (i = 0; gb2312buf[2 * i] > 0xA0 && gb2312buf[2 * i]  < 0xff; i++) {
-		offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[i]);
+	i = 0;
+	for (;;) {
+		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
+			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
+			i += 2;
+		} else if (gb2312buf[i] > 0x20 && gb2312buf[i] < 0x80) {
+			offset = gb2312code_to_fontoffset(0xa1a3 + 0x100 * (gb2312buf[i] - 0x21));
+			i++;
+		} else
+			break;
+
 		debug_print("offset = %#x", offset);
 		memset(&bmp, 0, sizeof(bmp));
 		set_header(&bmp, 16, 16, bits_per_pix);
