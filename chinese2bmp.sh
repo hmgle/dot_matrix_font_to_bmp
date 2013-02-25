@@ -19,4 +19,4 @@ then
 	help
 	exit 0
 fi
-echo $1|./utf8togb2312 |./gb2312tobmps |./bmps2bmp.sh
+echo "$1"|./utf8togb2312 |./gb2312tobmps |./bmps2bmp.sh
