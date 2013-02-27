@@ -61,9 +61,9 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[0]);
+	/* debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[0]); */
 	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[0]);
-	debug_print("offset = %#x", offset);
+	/* debug_print("offset = %#x", offset); */
 	memset(&bmp, 0, sizeof(bmp));
 	set_header(&bmp, 16, 16, bits_per_pix);
 	image_size = bmp.dib_h.image_size;
@@ -71,9 +71,9 @@ int main(int argc, char **argv)
 	memset(bmp.pdata, 0, image_size);
 	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix);
 
-	debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[1]);
+	/* debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[1]); */
 	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[1]);
-	debug_print("offset = %#x", offset);
+	/* debug_print("offset = %#x", offset); */
 	memset(&bmp2, 0, sizeof(bmp2));
 	set_header(&bmp2, 16, 16, bits_per_pix);
 	image_size = bmp2.dib_h.image_size;
@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 	memset(bmp2.pdata, 0, image_size);
 	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp2, bits_per_pix);
 
-	debug_print("will memset bmp_all");
+	/* debug_print("will memset bmp_all"); */
 
 	memset(&bmp_all, 0, sizeof(bmp_all));
 	set_header(&bmp_all, 
@@ -89,8 +89,8 @@ int main(int argc, char **argv)
 		   bmp.dib_h.height,
 		   bmp.dib_h.bits_per_pix);
 	bmp_all.pdata = malloc(bmp_all.dib_h.image_size);
-	debug_print("bmp_all.dib_h.image_size is %d", bmp_all.dib_h.image_size);
-	debug_print("bmp_all.pdata is %#x", bmp_all.pdata);
+	/* debug_print("bmp_all.dib_h.image_size is %d", bmp_all.dib_h.image_size); */
+	/* debug_print("bmp_all.pdata is %#x", bmp_all.pdata); */
 	bmp_h_combin(&bmp, &bmp2, &bmp_all);
 
 	ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);

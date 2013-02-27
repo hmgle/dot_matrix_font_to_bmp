@@ -22,7 +22,6 @@ set_header(bmp_file_t *pbmp_f,
 	pbmp_f->dib_h.compression = 0;
 	rowsize = (bits_per_pix * width + 31) / 32 * 4; /* 4字节对齐 */
 	pbmp_f->dib_h.image_size = rowsize * height;
-	debug_print("pbmp_f->dib_h.image_size = %d", pbmp_f->dib_h.image_size);
 	pbmp_f->dib_h.x_pix_per_meter = 0;
 	pbmp_f->dib_h.y_pix_per_meter = 0;
 	pbmp_f->dib_h.colors_in_colortable = 0;
@@ -147,11 +146,9 @@ bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 	uint32_t row_length_src2;
 	uint8_t *ptrbmpdata;
 
-	debug_print("dst->pdata is %#x", dst->pdata);
 	memset(&dst->bmp_h, 0, sizeof(struct bmp_file_header));
 	memset(&dst->dib_h, 0, sizeof(struct dib_header));
 
-	debug_print("dst->pdata is %#x", dst->pdata);
 	dst->bmp_h.magic[0] = 'B';
 	dst->bmp_h.magic[1] = 'M';
 	dst->bmp_h.offset = sizeof(bmp_file_header_t) + sizeof(dib_header_t);
@@ -169,7 +166,6 @@ bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 	dst->dib_h.colors_in_colortable = 0;
 	dst->dib_h.important_color_count = 0;
 	dst->bmp_h.file_size = dst->bmp_h.offset + dst->dib_h.image_size;
-	debug_print("dst->bmp_h.file_size = %d", dst->bmp_h.file_size);
 
 	rowsize_src1 = (src1->dib_h.bits_per_pix * src1->dib_h.width + 31) / 32 * 4;
 	rowsize_src2 = (src2->dib_h.bits_per_pix * src2->dib_h.width + 31) / 32 * 4;
@@ -178,7 +174,6 @@ bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 
 	ptrbmpdata = dst->pdata;
 	for (i = 0; i < dst->dib_h.height; i++) {
-		debug_print("row_length_src1 = %d", row_length_src1);
 		memcpy(ptrbmpdata, 
 			src1->pdata + i * rowsize_src1, 
 			row_length_src1);
