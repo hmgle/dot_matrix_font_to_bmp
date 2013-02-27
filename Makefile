@@ -3,6 +3,9 @@ DEBUG =
 
 CFLAGS = -Wall -O2
 
+CROSS:=
+CC = $(CROSS)gcc
+
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG=1
 else
@@ -12,7 +15,7 @@ endif
 TARGET = test utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp
 TMPTARGET = test_bmp_h_combin
 
-all: $(TARGET) $(TMPTARGET)
+all: $(TARGET)
 
 test: test.o dot_matrix_font_to_bmp.o
 
