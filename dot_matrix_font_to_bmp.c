@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "debug_log.h"
 #include "dot_matrix_font_to_bmp.h"
 
@@ -191,5 +192,20 @@ bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 
 		ptrbmpdata += rowsize;
 	}
+	return dst;
+}
+
+bmp_file_t *
+bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
+{
+	bmp_file_t tmp;
+
+	memcpy(&tmp, dst, sizeof(bmp_file_t));
+	tmp.pdata = malloc(tmp.dib_h.image_size);
+	memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
+	dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
+	bmp_h_combin(&tmp, add, dst);
+
+	free(tmp.pdata);
 	return dst;
 }
