@@ -190,6 +190,60 @@ bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 	return dst;
 }
 
+/*
+ * 位图垂直合并
+ */
+bmp_file_t *
+bmp_v_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
+{
+	int i;
+	uint32_t rowsize;
+	uint32_t rowsize_src1;
+	uint32_t rowsize_src2;
+	uint32_t row_length_src1;
+	uint32_t row_length_src2;
+	uint8_t *ptrbmpdata;
+
+	memset(&dst->bmp_h, 0, sizeof(struct bmp_file_header));
+	memset(&dst->dib_h, 0, sizeof(struct dib_header));
+
+	dst->bmp_h.magic[0] = 'B';
+	dst->bmp_h.magic[1] = 'M';
+	dst->bmp_h.offset = sizeof(bmp_file_header_t) + sizeof(dib_header_t);
+	dst->dib_h.dib_header_size = sizeof(dib_header_t);
+	dst->dib_h.width = src1->dib_h.width;
+	dst->dib_h.height = src1->dib_h.height + src2->dib_h.height;
+	dst->dib_h.planes = 1;
+	dst->dib_h.bits_per_pix = src1->dib_h.bits_per_pix;
+	dst->dib_h.compression = 0;
+
+	rowsize = (dst->dib_h.bits_per_pix * dst->dib_h.width + 31) / 32 * 4;
+	dst->dib_h.image_size = rowsize * dst->dib_h.height;
+	dst->dib_h.x_pix_per_meter = 0;
+	dst->dib_h.y_pix_per_meter = 0;
+	dst->dib_h.colors_in_colortable = 0;
+	dst->dib_h.important_color_count = 0;
+	dst->bmp_h.file_size = dst->bmp_h.offset + dst->dib_h.image_size;
+
+	rowsize_src1 = (src1->dib_h.bits_per_pix * src1->dib_h.width + 31) / 32 * 4;
+	rowsize_src2 = (src2->dib_h.bits_per_pix * src2->dib_h.width + 31) / 32 * 4;
+	row_length_src1 = src1->dib_h.width * (src1->dib_h.bits_per_pix / 8);
+	row_length_src2 = src2->dib_h.width * (src1->dib_h.bits_per_pix / 8);
+
+	ptrbmpdata = dst->pdata;
+
+	/*
+	 * 按从上到下的顺序合并
+	 * 若需从下到上的顺序， 则：
+	 * memcpy(ptrbmpdata, src1->pdata, src1->dib_h.image_size);
+	 * memcpy(ptrbmpdata + src1->dib_h.image_size, 
+	 *        src2->pdata, src2->dib_h.image_size);
+	 */
+	memcpy(ptrbmpdata, src2->pdata, src2->dib_h.image_size);
+	memcpy(ptrbmpdata + src2->dib_h.image_size, src1->pdata, src1->dib_h.image_size);
+	return dst;
+}
+
 bmp_file_t *
 bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 {
@@ -204,3 +258,19 @@ bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 	free(tmp.pdata);
 	return dst;
 }
+
+bmp_file_t *
+bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
+{
+	bmp_file_t tmp;
+
+	memcpy(&tmp, dst, sizeof(bmp_file_t));
+	tmp.pdata = malloc(tmp.dib_h.image_size);
+	memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
+	dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
+	bmp_v_combin(&tmp, add, dst);
+
+	free(tmp.pdata);
+	return dst;
+}
+

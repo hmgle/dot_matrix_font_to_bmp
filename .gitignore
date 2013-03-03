@@ -8,4 +8,5 @@ gb2312tobmps
 utf8togb2312
 bmps2bmp
 bmpsall2bmp
+bmpsallv2bmp
 test_bmp_h_combin

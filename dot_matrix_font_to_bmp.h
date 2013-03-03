@@ -39,5 +39,7 @@ void fontdata2bmp(const uint8_t *ptrfontdata, uint32_t width, uint32_t hegiht, b
 uint32_t gb2312code_to_fontoffset(uint32_t gb2312code);
 
 bmp_file_t * bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
+bmp_file_t * bmp_v_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
 bmp_file_t *bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add);
+bmp_file_t *bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add);
 #endif

@@ -12,7 +12,7 @@ else
 	CFLAGS += -DDEBUG=0
 endif
 
-TARGET = test utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp
+TARGET = test utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp bmpsallv2bmp
 TMPTARGET = test_bmp_h_combin
 
 all: $(TARGET)
@@ -28,6 +28,8 @@ test_bmp_h_combin: test_bmp_h_combin.o dot_matrix_font_to_bmp.o
 bmps2bmp: bmps2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
 
 bmpsall2bmp: bmpsall2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
+
+bmpsallv2bmp: bmpsallv2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
 
 clean:
 	-rm -f *.o $(TARGET)
