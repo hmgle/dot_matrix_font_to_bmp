@@ -26,19 +26,32 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见LICENSE.md文件�
 
 假如你要生成字符串 `字符生成位图测试0x16v1.0.0` 的位图, 执行下面的命令将得到想要的位图, 保存在 `test.bmp`:
 
-    ./characters2bmp.sh "字符生成位图测试0x16v1.0.0" > ./test.bmp
+    ./characters2bmp.sh "字符生成位图测试0x16v1.0.0" > ./test1.bmp
+
+
+![test1.bmp](test1.bmp)
 
 支持中间混杂了空格， 如：
 
-    ./characters2bmp.sh "后面有1个空格   前面有1个空格" > ./test.bmp
+    ./characters2bmp.sh "后面有3个空格   前面有3个空格" > ./test2.bmp
+
+
+![test2.bmp](test2.bmp)
 
 生成含有多行汉字的位图：
 
-    (./characters2bmp.sh    "红豆生南国，" \
-     && ./characters2bmp.sh "春来发几枝？" \
-     && ./characters2bmp.sh "愿君多采撷，" \
-     && ./characters2bmp.sh "此物最想思。") \
+
+    (./characters2bmp.sh "       " \
+    && ./characters2bmp.sh " 红豆生南国，" \
+    && ./characters2bmp.sh " 春来发几枝？" \
+    && ./characters2bmp.sh " 愿君多采撷，" \
+    && ./characters2bmp.sh " 此物最想思。" \
+    && ./characters2bmp.sh "       " \
+    && ./characters2bmp.sh "   -王维 ") \
     | ./bmpsallv2bmp > poem.bmp
+
+
+![poem.bmp](poem.bmp)
 
 ##  用途
 
