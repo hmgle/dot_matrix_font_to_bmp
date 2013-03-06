@@ -6,7 +6,7 @@
 
 ## 授权协议
 
-dot_matrix_font_to_bmp 在 MIT license协议下发布。参见LICENSE.md文件。
+dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICENSE.md)文件。
 
 ## 使用方法
 
