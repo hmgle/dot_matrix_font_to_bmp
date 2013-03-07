@@ -132,6 +132,21 @@ gb2312code_to_fontoffset(uint32_t gb2312code)
 	return fontoffset;
 }
 
+bmp_file_t *
+create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix)
+{
+	uint32_t rowsize;
+
+		debug_print();
+	set_header(dst, w, h, bits_per_pix);
+		debug_print();
+	rowsize = (bits_per_pix * w + 31) / 32 * 4; /* 4字节对齐 */
+		debug_print("rowsizt * h is %d", rowsize * h);
+	memset(dst->pdata, 0, rowsize * h);
+		debug_print();
+	return dst;
+}
+
 /*
  * 位图水平合并
  */
@@ -196,7 +211,6 @@ bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 bmp_file_t *
 bmp_v_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 {
-	int i;
 	uint32_t rowsize;
 	uint32_t rowsize_src1;
 	uint32_t rowsize_src2;
@@ -259,6 +273,9 @@ bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 	return dst;
 }
 
+/*
+ * 合并的位图水平分辨率相同才能调用该函数
+ */
 bmp_file_t *
 bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 {
@@ -274,3 +291,61 @@ bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 	return dst;
 }
 
+/* 
+ * 支持水平分辨率不同位图
+ */
+bmp_file_t *
+bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
+{
+	bmp_file_t tmp_bmp;
+	bmp_file_t blank_bmp;
+	uint32_t w_diff;
+	uint32_t rowsize;
+
+	if (dst->dib_h.width > add->dib_h.width) {
+		w_diff = dst->dib_h.width - add->dib_h.width;
+
+		debug_print();
+		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
+		debug_print();
+		blank_bmp.pdata = malloc(rowsize * add->dib_h.height);
+		debug_print();
+		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix);
+		debug_print();
+		memcpy(&tmp_bmp, add, sizeof(tmp_bmp));
+		debug_print();
+		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
+		debug_print();
+		bmp_h_combin_2(&tmp_bmp, &blank_bmp);
+		debug_print();
+		bmp_v_combin_2(dst, &tmp_bmp);
+		debug_print();
+
+		free(tmp_bmp.pdata);
+		debug_print();
+		free(blank_bmp.pdata);
+		debug_print();
+	} else if (dst->dib_h.width < add->dib_h.width) {
+		debug_print();
+		w_diff = add->dib_h.width - dst->dib_h.width;
+		debug_print();
+		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
+		debug_print();
+		blank_bmp.pdata = malloc(rowsize * dst->dib_h.height);
+		debug_print("rowsize is %d", rowsize);
+		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix);
+		debug_print();
+		bmp_h_combin_2(dst, &blank_bmp);
+		debug_print();
+		bmp_v_combin_2(dst, add);
+		debug_print();
+
+		debug_print();
+		debug_print();
+		free(blank_bmp.pdata);
+		debug_print();
+	} else
+		bmp_v_combin_2(dst, add);
+
+	return dst;
+}
