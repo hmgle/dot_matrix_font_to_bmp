@@ -137,13 +137,9 @@ create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix)
 {
 	uint32_t rowsize;
 
-		debug_print();
 	set_header(dst, w, h, bits_per_pix);
-		debug_print();
 	rowsize = (bits_per_pix * w + 31) / 32 * 4; /* 4字节对齐 */
-		debug_print("rowsizt * h is %d", rowsize * h);
 	memset(dst->pdata, 0, rowsize * h);
-		debug_print();
 	return dst;
 }
 
@@ -292,7 +288,8 @@ bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 }
 
 /* 
- * 支持水平分辨率不同位图
+ * 垂直合并支持水平分辨率不同位图
+ * 水平分辨率较小的位图左边将补齐空白
  */
 bmp_file_t *
 bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
@@ -305,45 +302,26 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
 	if (dst->dib_h.width > add->dib_h.width) {
 		w_diff = dst->dib_h.width - add->dib_h.width;
 
-		debug_print();
 		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
-		debug_print();
 		blank_bmp.pdata = malloc(rowsize * add->dib_h.height);
-		debug_print();
 		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix);
-		debug_print();
 		memcpy(&tmp_bmp, add, sizeof(tmp_bmp));
-		debug_print();
 		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
-		debug_print();
+		memcpy(tmp_bmp.pdata, add->pdata, tmp_bmp.dib_h.image_size);
 		bmp_h_combin_2(&tmp_bmp, &blank_bmp);
-		debug_print();
 		bmp_v_combin_2(dst, &tmp_bmp);
-		debug_print();
 
 		free(tmp_bmp.pdata);
-		debug_print();
 		free(blank_bmp.pdata);
-		debug_print();
 	} else if (dst->dib_h.width < add->dib_h.width) {
-		debug_print();
 		w_diff = add->dib_h.width - dst->dib_h.width;
-		debug_print();
 		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
-		debug_print();
 		blank_bmp.pdata = malloc(rowsize * dst->dib_h.height);
-		debug_print("rowsize is %d", rowsize);
 		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix);
-		debug_print();
 		bmp_h_combin_2(dst, &blank_bmp);
-		debug_print();
 		bmp_v_combin_2(dst, add);
-		debug_print();
 
-		debug_print();
-		debug_print();
 		free(blank_bmp.pdata);
-		debug_print();
 	} else
 		bmp_v_combin_2(dst, add);
 
