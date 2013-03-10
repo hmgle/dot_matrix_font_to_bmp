@@ -13,3 +13,14 @@ done
 
 IFS=$SAVEIFS
 cat null3.tmp~
+if [ -f null3.tmp~ ]; then
+	rm null3.tmp~
+fi
+
+if [ -f null1.tmp~ ]; then
+	rm null1.tmp~
+fi
+
+if [ -f null0.tmp~ ]; then
+	rm null0.tmp~
+fi
