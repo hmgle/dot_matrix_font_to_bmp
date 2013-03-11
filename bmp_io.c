@@ -3,7 +3,8 @@
 #include "bmp_io.h"
 
 /* 读取成功返回0, 该函数申请内存但不释放， 调用完后记得释放 */
-int read_and_alloc_one_bmp(FILE *fp, bmp_file_t *ptrbmp)
+int
+read_and_alloc_one_bmp(FILE *fp, bmp_file_t *ptrbmp)
 {
 	size_t ret;
 
@@ -21,7 +22,8 @@ int read_and_alloc_one_bmp(FILE *fp, bmp_file_t *ptrbmp)
 	return 0;
 }
 
-void free_bmp(bmp_file_t *ptrbmp)
+void
+free_bmp(bmp_file_t *ptrbmp)
 {
 	if (ptrbmp) {
 		if (ptrbmp->pdata) {
@@ -33,7 +35,8 @@ void free_bmp(bmp_file_t *ptrbmp)
 	}
 }
 
-int output_bmp(FILE *fp, bmp_file_t *ptrbmp)
+int
+output_bmp(FILE *fp, bmp_file_t *ptrbmp)
 {
 	int ret;
 
