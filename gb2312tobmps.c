@@ -40,7 +40,8 @@ int main(int argc, char **argv)
 			break;
 		default: /* '?' */
 			fprintf(stderr, 
-				"Usage: %s [-d bitdepth(16 or 24)]\n", 
+				"Usage: %s [-d bitdepth(16 or 24)] "
+				"[-c]\n", 
 				argv[0]);
 			exit(1);
 		}
