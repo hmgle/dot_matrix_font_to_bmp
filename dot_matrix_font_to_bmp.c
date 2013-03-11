@@ -46,7 +46,8 @@ void
 conv_row(const uint8_t *ptrfontdata, 
 	 uint32_t width, 
 	 uint8_t *pdest,
-	 uint16_t bits_per_pix)
+	 uint16_t bits_per_pix,
+	 int color_anti_flag)
 {
 	int i;
 	int char_num;
@@ -59,6 +60,7 @@ conv_row(const uint8_t *ptrfontdata,
 		char_num = i / 8;
 		char_bit = 7 - i % 8;
 		bit = ptrfontdata[char_num] & (1 << char_bit);
+		bit = color_anti_flag ? !bit : bit;
 		if (bit) {
 			switch (bits_per_pix) {
 			case 1:
@@ -98,7 +100,8 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 	     uint32_t width, 
 	     uint32_t height, 
 	     bmp_file_t *ptrbmp, 
-	     uint16_t bits_per_pix)
+	     uint16_t bits_per_pix,
+	     int color_anti_flag)
 {
 	uint32_t rowsize;
 	uint8_t *ptrbmpdata;
@@ -116,7 +119,8 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 		conv_row(ptrfontdata + (width + 7) / 8 * i, 
 			 width, 
 			 ptrbmpdata,
-			 bits_per_pix);
+			 bits_per_pix,
+			 color_anti_flag);
 		ptrbmpdata += rowsize;
 	}
 }

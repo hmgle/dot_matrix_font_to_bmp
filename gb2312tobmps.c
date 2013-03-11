@@ -27,12 +27,16 @@ int main(int argc, char **argv)
 	uint32_t image_size;
 	int ret;
 	char *pret;
+	int color_anti_flag = 0;
 	int i;
 
-	while ((opt = getopt(argc, argv, "d:")) != -1) {
+	while ((opt = getopt(argc, argv, "d:c")) != -1) {
 		switch (opt) {
 		case 'd':
 			bits_per_pix = atoi(optarg);
+			break;
+		case 'c':
+			color_anti_flag = 1;
 			break;
 		default: /* '?' */
 			fprintf(stderr, 
@@ -77,7 +81,7 @@ int main(int argc, char **argv)
 		image_size = bmp.dib_h.image_size;
 		bmp.pdata = malloc(image_size);
 		memset(bmp.pdata, 0, image_size);
-		fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix);
+		fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
 
 		ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);
 		if (ret < 0) {

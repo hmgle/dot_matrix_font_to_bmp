@@ -1,4 +1,4 @@
-DEBUG = 1
+DEBUG =
 .PHONY: all clean
 
 CFLAGS = -Wall -O2
