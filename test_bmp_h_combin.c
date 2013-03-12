@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 	image_size = bmp.dib_h.image_size;
 	bmp.pdata = malloc(image_size);
 	memset(bmp.pdata, 0, image_size);
-	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix);
+	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, 0);
 
 	/* debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[1]); */
 	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[1]);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 	image_size = bmp2.dib_h.image_size;
 	bmp2.pdata = malloc(image_size);
 	memset(bmp2.pdata, 0, image_size);
-	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp2, bits_per_pix);
+	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp2, bits_per_pix, 0);
 
 	/* debug_print("will memset bmp_all"); */
 

@@ -32,6 +32,11 @@ typedef struct bmp_file {
 	uint8_t *pdata;
 } __attribute__ ((packed)) bmp_file_t;
 
+typedef struct bmp_size {
+	uint32_t width;
+	uint32_t height;
+} bmp_size_t;
+
 void set_header(bmp_file_t *pbmp_f, uint32_t width, uint32_t height, uint16_t bits_per_pix);
 void get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_header_t *dib_header);
 void conv_row(const uint8_t *ptrfontdata, uint32_t width, uint8_t *pdest, uint16_t bits_per_pix, int color_anti_flag);

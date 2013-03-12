@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	image_size = bmp.dib_h.image_size;
 	bmp.pdata = malloc(image_size);
 	memset(bmp.pdata, 0, image_size);
-	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix);
+	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, 0);
 	ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, save_fp);
 	if (ret < 0) {
 		perror("fwrite");
