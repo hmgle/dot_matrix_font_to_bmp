@@ -1,10 +1,5 @@
-#include "dot_matrix_font_to_bmp.h"
 #include "encoding_convert.h"
 #include "debug_log.h"
-
-#ifndef MAX_LINE
-#define MAX_LINE	1024
-#endif
 
 int main(int argc, char **argv)
 {

@@ -20,7 +20,7 @@ all: $(TARGET) $(TMPTARGET)
 
 test: test.o dot_matrix_font_to_bmp.o
 
-utf8togb2312: utf8togb2312.o encoding_convert.o dot_matrix_font_to_bmp.o
+utf8togb2312: utf8togb2312.o encoding_convert.o
 
 gb2312tobmps: gb2312tobmps.o dot_matrix_font_to_bmp.o
 
@@ -34,7 +34,7 @@ bmpsall2bmp: bmpsall2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
 
 bmpsallv2bmp: bmpsallv2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
 
-text2bmp: text2bmp.o dot_matrix_font_to_bmp.o
+text2bmp: text2bmp.o dot_matrix_font_to_bmp.o encoding_convert.o
 
 combin_v_3_test: combin_v_3_test.o dot_matrix_font_to_bmp.o bmp_io.o
 
