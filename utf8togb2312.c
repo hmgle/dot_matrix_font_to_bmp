@@ -39,6 +39,7 @@ int main(int argc, char **argv)
 		} else
 			ptr_gb2312 += 1;
 	}
+	ptr_gb2312[0] = '\0';
 	debug_print("%s", gb2312buf);
 	fwrite(gb2312buf, 1, strlen((char *)gb2312buf), stdout);
 
