@@ -1,9 +1,15 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
 #include "dot_matrix_font_to_bmp.h"
 #include "encoding_convert.h"
 #include "debug_log.h"
+
+#define GB2312_HZK	"gb2312.hzk"
 
 struct text_style {
 	uint32_t left_margin;
@@ -30,6 +36,13 @@ int main(int argc, char **argv)
 	uint8_t *ptr_gb2312;
 	uint8_t unicode[2] = {0};
 	uint16_t gb2312_code;
+	uint8_t *addr_fd_in;
+	struct stat fd_stat;
+	int font_fd;
+	int i;
+	uint32_t offset;
+	bmp_file_t bmp;
+	uint32_t image_size;
 	int ret;
 
 	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o:")) != -1) {
@@ -83,6 +96,22 @@ int main(int argc, char **argv)
 		}
 	}
 	mem_addr = mem_gb2312("./GB2312", &gb2312_num);
+	font_fd = open(GB2312_HZK, O_RDONLY);
+	if (font_fd < 0) {
+		perror("open");
+		exit(1);
+	}
+	ret = fstat(font_fd, &fd_stat);
+	if (ret == -1) {
+		perror("fstat");
+		exit(1);
+	}
+	addr_fd_in = mmap(NULL, (size_t) fd_stat.st_size,
+			  PROT_READ, MAP_PRIVATE, font_fd, (off_t) 0);
+	if (addr_fd_in == MAP_FAILED) {
+		perror("mmap");
+		exit(1);
+	}
 
 	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
 		ptr = linebuf;
@@ -105,11 +134,60 @@ int main(int argc, char **argv)
 			} else
 				ptr_gb2312 += 1;
 		}
-	}
+		ptr_gb2312[0] = '\0';
+		fwrite(gb2312buf, 1, strlen((char *)gb2312buf), stdout);
+
+		/*
+		 * gb2312tobmps
+		 */
+		i = 0;
+		for (;;) {
+			if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
+				offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
+				i += 2;
+			} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
+				offset = gb2312code_to_fontoffset(0xa1a3 + 0x100 * (gb2312buf[i] - 0x21));
+				i++;
+			} else
+				break;
+
+			debug_print("offset = %#x", offset);
+			memset(&bmp, 0, sizeof(bmp));
+			set_header(&bmp, 16, 16, bits_per_pix);
+			image_size = bmp.dib_h.image_size;
+			bmp.pdata = malloc(image_size);
+			memset(bmp.pdata, 0, image_size);
+			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
+
+			ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);
+			if (ret < 0) {
+				perror("fwrite");
+				exit(1);
+			}
+			ret = fwrite(&bmp.dib_h, sizeof(dib_header_t), 1, stdout);
+			if (ret < 0) {
+				perror("fwrite");
+				exit(1);
+			}
+			ret = fwrite(bmp.pdata, sizeof(uint8_t), image_size, stdout);
+			if (ret < 0) {
+				perror("fwrite");
+				exit(1);
+			}
+		} /* for (;;) */
+	} /* while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) */
+
 
 	/*
 	 * release
 	 */
+	ret = munmap(addr_fd_in, (size_t) fd_stat.st_size);
+	if (ret == -1) {
+		perror("munmap");
+		exit(1);
+	}
+	close(font_fd);
+
 	unmem_gb2312(mem_addr);
 	if (in != stdin)
 		fclose(in);
