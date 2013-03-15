@@ -42,6 +42,8 @@ int main(int argc, char **argv)
 	int i;
 	uint32_t offset;
 	bmp_file_t bmp;
+	bmp_file_t bmp_line;
+	bmp_file_t bmp_all;
 	uint32_t image_size;
 	int ret;
 
@@ -85,7 +87,7 @@ int main(int argc, char **argv)
 					"[inputfile]\n", argv[0]);
 			exit(1);
 		}
-	}
+	} /* while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o:")) != -1) */
 	if (argc > optind) {
 		in = fopen(argv[optind], "r");
 		if (!in) {
@@ -113,6 +115,8 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	memset(&bmp_line, 0, sizeof(bmp_line));
+	memset(&bmp_all, 0, sizeof(bmp_line));
 	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
 		ptr = linebuf;
 		ptr_gb2312 = gb2312buf;
@@ -158,29 +162,17 @@ int main(int argc, char **argv)
 			bmp.pdata = malloc(image_size);
 			memset(bmp.pdata, 0, image_size);
 			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
-
-			ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);
-			if (ret < 0) {
-				perror("fwrite");
-				exit(1);
-			}
-			ret = fwrite(&bmp.dib_h, sizeof(dib_header_t), 1, stdout);
-			if (ret < 0) {
-				perror("fwrite");
-				exit(1);
-			}
-			ret = fwrite(bmp.pdata, sizeof(uint8_t), image_size, stdout);
-			if (ret < 0) {
-				perror("fwrite");
-				exit(1);
-			}
+			bmp_h_combin_2(&bmp_line, &bmp);
 		} /* for (;;) */
+		bmp_v_combin_3(&bmp_all, &bmp_line);
 	} /* while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) */
 
 
 	/*
 	 * release
 	 */
+	free(bmp_all.pdata);
+	free(bmp_line.pdata);
 	ret = munmap(addr_fd_in, (size_t) fd_stat.st_size);
 	if (ret == -1) {
 		perror("munmap");
