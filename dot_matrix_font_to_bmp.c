@@ -137,13 +137,19 @@ gb2312code_to_fontoffset(uint32_t gb2312code)
 }
 
 bmp_file_t *
-create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix)
+create_blank_bmp(bmp_file_t *dst, 
+		uint32_t w, uint32_t h, 
+		uint16_t bits_per_pix, 
+		int color_anti_flag)
 {
 	uint32_t rowsize;
 
 	set_header(dst, w, h, bits_per_pix);
 	rowsize = (bits_per_pix * w + 31) / 32 * 4; /* 4字节对齐 */
-	memset(dst->pdata, 0, rowsize * h);
+	if (!color_anti_flag)
+		memset(dst->pdata, 0, rowsize * h);
+	else
+		memset(dst->pdata, 0xff, rowsize * h);
 	return dst;
 }
 
@@ -308,7 +314,7 @@ bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
  * 水平分辨率较小的位图左边将补齐空白
  */
 bmp_file_t *
-bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
+bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
 {
 	bmp_file_t tmp_bmp;
 	bmp_file_t blank_bmp;
@@ -329,7 +335,7 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
 
 		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
 		blank_bmp.pdata = malloc(rowsize * add->dib_h.height);
-		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix);
+		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix, color_anti_flag);
 		memcpy(&tmp_bmp, add, sizeof(tmp_bmp));
 		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
 		memcpy(tmp_bmp.pdata, add->pdata, tmp_bmp.dib_h.image_size);
@@ -342,7 +348,7 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
 		w_diff = add->dib_h.width - dst->dib_h.width;
 		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
 		blank_bmp.pdata = malloc(rowsize * dst->dib_h.height);
-		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix);
+		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix, color_anti_flag);
 		bmp_h_combin_2(dst, &blank_bmp);
 		bmp_v_combin_2(dst, add);
 

@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 	uint32_t image_size;
 	int ret;
 
-	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o:")) != -1) {
+	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o")) != -1) {
 		switch (opt) {
 		case 'l': /* 左边距 */
 			style.left_margin = strtol(optarg, NULL, 0);
@@ -119,11 +119,11 @@ int main(int argc, char **argv)
 	memset(&bmp_line, 0, sizeof(bmp_line));
 	memset(&bmp_all, 0, sizeof(bmp_all));
 	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
-		ptr = linebuf;
 		ptr_gb2312 = gb2312buf;
+		ptr = linebuf;
+		if (*ptr == '\n')
+			*ptr = ' ';
 		while (*ptr) {
-			if (*ptr == '\n')
-				*ptr = ' ';
 			ret = utf8tounicode(ptr, unicode);
 			if (ret < 0) {
 				debug_print("utf8tounicode return %d\n", ret);
@@ -166,7 +166,7 @@ int main(int argc, char **argv)
 			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
 			bmp_h_combin_2(&bmp_line, &bmp);
 		} /* for (;;) */
-		bmp_v_combin_3(&bmp_all, &bmp_line);
+		bmp_v_combin_3(&bmp_all, &bmp_line, color_anti_flag);
 		if (bmp_line.pdata) {
 			free(bmp_line.pdata);
 			bmp_line.pdata = NULL;

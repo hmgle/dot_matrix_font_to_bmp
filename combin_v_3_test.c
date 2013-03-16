@@ -19,7 +19,7 @@ int main(int argc, char **argv)
 	memset(&bmp_1, 0, sizeof(bmp_1));
 	ret = read_and_alloc_one_bmp(stdin, &bmp_all);
 	while (!read_and_alloc_one_bmp(stdin, &bmp_1)) {
-		bmp_v_combin_3(&bmp_all, &bmp_1);
+		bmp_v_combin_3(&bmp_all, &bmp_1, 0);
 		free(bmp_1.pdata);
 
 		if ((ch = fgetc(stdin)) == 'B')
