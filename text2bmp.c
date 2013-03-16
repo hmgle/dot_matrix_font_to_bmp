@@ -46,6 +46,7 @@ int main(int argc, char **argv)
 	bmp_file_t bmp_char;
 	bmp_file_t bmp_line;
 	bmp_file_t bmp_all;
+	bmp_file_t bmp_blank;
 	uint32_t image_size;
 	int ret;
 
@@ -121,6 +122,8 @@ int main(int argc, char **argv)
 	bmp_char.pdata = malloc(FONT_BMP_SIZE);
 	memset(&bmp_line, 0, sizeof(bmp_line));
 	memset(&bmp_all, 0, sizeof(bmp_all));
+	memset(&bmp_blank, 0, sizeof(bmp_blank));
+	bmp_blank.pdata = malloc(FONT_BMP_SIZE);
 	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
 		ptr_gb2312 = gb2312buf;
 		ptr = linebuf;
@@ -133,7 +136,6 @@ int main(int argc, char **argv)
 				exit(1);
 			}
 			ptr += ret;
-			debug_print("u[0] = %#x u[1] = %#x", unicode[0], unicode[1]);
 			gb2312_code = unicode_to_gb2312(unicode[0] + unicode[1] * 0x100, 
 							mem_addr, 
 							gb2312_num);
@@ -160,7 +162,6 @@ int main(int argc, char **argv)
 			} else
 				break;
 
-			debug_print("offset = %#x", offset);
 			set_header(&bmp_char, 16, 16, bits_per_pix);
 			image_size = bmp_char.dib_h.image_size;
 			memset(bmp_char.pdata, 0, image_size);
@@ -168,6 +169,14 @@ int main(int argc, char **argv)
 			bmp_h_combin_2(&bmp_line, &bmp_char);
 		} /* for (;;) */
 		bmp_v_combin_3(&bmp_all, &bmp_line, color_anti_flag);
+		if (style.line_spacing > 0) {
+			create_blank_bmp(&bmp_blank, 
+					1, 
+					style.line_spacing, 
+					bits_per_pix, 
+					color_anti_flag);
+			bmp_v_combin_3(&bmp_all, &bmp_blank, color_anti_flag);
+		}
 		if (bmp_line.pdata) {
 			free(bmp_line.pdata);
 			bmp_line.pdata = NULL;
@@ -183,6 +192,10 @@ int main(int argc, char **argv)
 	/*
 	 * release
 	 */
+	if (bmp_blank.pdata) {
+		free(bmp_blank.pdata);
+		bmp_blank.pdata = NULL;
+	}
 	free(bmp_char.pdata);
 	if (bmp_all.pdata) {
 		free(bmp_all.pdata);
