@@ -315,6 +315,15 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add)
 	uint32_t w_diff;
 	uint32_t rowsize;
 
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+		return dst;
+	} 
+	/*
+	 * else 
+	 */
 	if (dst->dib_h.width > add->dib_h.width) {
 		w_diff = dst->dib_h.width - add->dib_h.width;
 
