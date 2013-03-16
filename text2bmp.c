@@ -11,6 +11,7 @@
 #include "debug_log.h"
 
 #define GB2312_HZK	"gb2312.hzk"
+#define FONT_BMP_SIZE	1024
 
 struct text_style {
 	uint32_t left_margin;
@@ -42,7 +43,7 @@ int main(int argc, char **argv)
 	int font_fd;
 	int i;
 	uint32_t offset;
-	bmp_file_t bmp;
+	bmp_file_t bmp_char;
 	bmp_file_t bmp_line;
 	bmp_file_t bmp_all;
 	uint32_t image_size;
@@ -116,6 +117,8 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	memset(&bmp_char, 0, sizeof(bmp_char));
+	bmp_char.pdata = malloc(FONT_BMP_SIZE);
 	memset(&bmp_line, 0, sizeof(bmp_line));
 	memset(&bmp_all, 0, sizeof(bmp_all));
 	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
@@ -158,13 +161,11 @@ int main(int argc, char **argv)
 				break;
 
 			debug_print("offset = %#x", offset);
-			memset(&bmp, 0, sizeof(bmp));
-			set_header(&bmp, 16, 16, bits_per_pix);
-			image_size = bmp.dib_h.image_size;
-			bmp.pdata = malloc(image_size);
-			memset(bmp.pdata, 0, image_size);
-			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
-			bmp_h_combin_2(&bmp_line, &bmp);
+			set_header(&bmp_char, 16, 16, bits_per_pix);
+			image_size = bmp_char.dib_h.image_size;
+			memset(bmp_char.pdata, 0, image_size);
+			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp_char, bits_per_pix, color_anti_flag);
+			bmp_h_combin_2(&bmp_line, &bmp_char);
 		} /* for (;;) */
 		bmp_v_combin_3(&bmp_all, &bmp_line, color_anti_flag);
 		if (bmp_line.pdata) {
@@ -182,16 +183,21 @@ int main(int argc, char **argv)
 	/*
 	 * release
 	 */
-	free(bmp_all.pdata);
-	if (bmp_line.pdata)
+	free(bmp_char.pdata);
+	if (bmp_all.pdata) {
+		free(bmp_all.pdata);
+		bmp_all.pdata = NULL;
+	}
+	if (bmp_line.pdata) {
 		free(bmp_line.pdata);
+		bmp_line.pdata = NULL;
+	}
 	ret = munmap(addr_fd_in, (size_t) fd_stat.st_size);
 	if (ret == -1) {
 		perror("munmap");
 		exit(1);
 	}
 	close(font_fd);
-
 	unmem_gb2312(mem_addr);
 	if (in != stdin)
 		fclose(in);
