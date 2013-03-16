@@ -122,6 +122,8 @@ int main(int argc, char **argv)
 		ptr = linebuf;
 		ptr_gb2312 = gb2312buf;
 		while (*ptr) {
+			if (*ptr == '\n')
+				*ptr = ' ';
 			ret = utf8tounicode(ptr, unicode);
 			if (ret < 0) {
 				debug_print("utf8tounicode return %d\n", ret);
@@ -181,7 +183,8 @@ int main(int argc, char **argv)
 	 * release
 	 */
 	free(bmp_all.pdata);
-	free(bmp_line.pdata);
+	if (bmp_line.pdata)
+		free(bmp_line.pdata);
 	ret = munmap(addr_fd_in, (size_t) fd_stat.st_size);
 	if (ret == -1) {
 		perror("munmap");
