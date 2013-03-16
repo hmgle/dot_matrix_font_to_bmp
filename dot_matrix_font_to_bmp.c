@@ -263,13 +263,19 @@ bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 {
 	bmp_file_t tmp;
 
-	memcpy(&tmp, dst, sizeof(bmp_file_t));
-	tmp.pdata = malloc(tmp.dib_h.image_size);
-	memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
-	dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
-	bmp_h_combin(&tmp, add, dst);
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+	} else {
+		memcpy(&tmp, dst, sizeof(bmp_file_t));
+		tmp.pdata = malloc(tmp.dib_h.image_size);
+		memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
+		dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
+		bmp_h_combin(&tmp, add, dst);
 
-	free(tmp.pdata);
+		free(tmp.pdata);
+	}
 	return dst;
 }
 
@@ -281,13 +287,19 @@ bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 {
 	bmp_file_t tmp;
 
-	memcpy(&tmp, dst, sizeof(bmp_file_t));
-	tmp.pdata = malloc(tmp.dib_h.image_size);
-	memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
-	dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
-	bmp_v_combin(&tmp, add, dst);
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+	} else {
+		memcpy(&tmp, dst, sizeof(bmp_file_t));
+		tmp.pdata = malloc(tmp.dib_h.image_size);
+		memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
+		dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
+		bmp_v_combin(&tmp, add, dst);
 
-	free(tmp.pdata);
+		free(tmp.pdata);
+	}
 	return dst;
 }
 
