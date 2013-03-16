@@ -34,7 +34,7 @@ bmpsall2bmp: bmpsall2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
 
 bmpsallv2bmp: bmpsallv2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
 
-text2bmp: text2bmp.o dot_matrix_font_to_bmp.o encoding_convert.o
+text2bmp: text2bmp.o dot_matrix_font_to_bmp.o encoding_convert.o bmp_io.o
 
 combin_v_3_test: combin_v_3_test.o dot_matrix_font_to_bmp.o bmp_io.o
 

@@ -7,6 +7,7 @@
 #include <sys/mman.h>
 #include "dot_matrix_font_to_bmp.h"
 #include "encoding_convert.h"
+#include "bmp_io.h"
 #include "debug_log.h"
 
 #define GB2312_HZK	"gb2312.hzk"
@@ -116,7 +117,7 @@ int main(int argc, char **argv)
 	}
 
 	memset(&bmp_line, 0, sizeof(bmp_line));
-	memset(&bmp_all, 0, sizeof(bmp_line));
+	memset(&bmp_all, 0, sizeof(bmp_all));
 	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
 		ptr = linebuf;
 		ptr_gb2312 = gb2312buf;
@@ -139,7 +140,6 @@ int main(int argc, char **argv)
 				ptr_gb2312 += 1;
 		}
 		ptr_gb2312[0] = '\0';
-		fwrite(gb2312buf, 1, strlen((char *)gb2312buf), stdout);
 
 		/*
 		 * gb2312tobmps
@@ -165,8 +165,17 @@ int main(int argc, char **argv)
 			bmp_h_combin_2(&bmp_line, &bmp);
 		} /* for (;;) */
 		bmp_v_combin_3(&bmp_all, &bmp_line);
+		if (bmp_line.pdata) {
+			free(bmp_line.pdata);
+			bmp_line.pdata = NULL;
+		}
+		memset(&bmp_line, 0, sizeof(bmp_line));
 	} /* while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) */
 
+	/*
+	 * output
+	 */
+	output_bmp(stdout, &bmp_all);
 
 	/*
 	 * release
