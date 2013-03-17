@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "debug_log.h"
 #include "dot_matrix_font_to_bmp.h"
 

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct bmp_file_header {
 	uint8_t magic[2];

@@ -23,6 +23,37 @@ struct text_style {
 	uint32_t max_line_length;
 };
 
+static char *fgets_utf8(char *s, int n, FILE *stream);
+
+static char *fgets_utf8(char *s, int n, FILE *stream)
+{
+	int c;
+	int length;
+	char *cs = s;
+
+	while (--n > 0) {
+		c = getc(stream);
+		if (c == EOF || ((*cs++ = c) == '\n'))
+			break;
+		length = get_utf8_length((const uint8_t *)&c);
+		switch (length) {
+		case 1:
+			break;
+		case 4:
+			*cs++ = getc(stream);
+		case 3:
+			*cs++ = getc(stream);
+		case 2:
+			*cs++ = getc(stream);
+			break;
+		default:
+			break;
+		}
+	}
+	*cs = '\0';
+	return (c == EOF && cs == s) ? NULL : s;
+}
+
 int main(int argc, char **argv)
 {
 	int opt;
@@ -41,6 +72,7 @@ int main(int argc, char **argv)
 	uint8_t *addr_fd_in;
 	struct stat fd_stat;
 	int font_fd;
+	int once_read;
 	int i;
 	uint32_t offset;
 	bmp_file_t bmp_char;
@@ -126,7 +158,10 @@ int main(int argc, char **argv)
 	memset(&bmp_all, 0, sizeof(bmp_all));
 	memset(&bmp_blank, 0, sizeof(bmp_blank));
 	bmp_blank.pdata = malloc(FONT_BMP_SIZE);
-	while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) {
+
+	once_read = (style.max_line_length > 0) 
+			? (style.max_line_length + 1) : (sizeof(linebuf) - 1);
+	while (fgets_utf8((char *)linebuf, once_read, in)) {
 		ptr_gb2312 = gb2312buf;
 		ptr = linebuf;
 		if (*ptr == '\n')
