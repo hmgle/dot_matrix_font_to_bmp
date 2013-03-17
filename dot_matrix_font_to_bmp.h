@@ -47,6 +47,7 @@ bmp_file_t *create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t b
 bmp_file_t *bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
 bmp_file_t *bmp_v_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
 bmp_file_t *bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add);
+bmp_file_t *bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag);
 bmp_file_t *bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add);
 bmp_file_t *bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag); /* 支持水平分辨率不同位图 */
 #endif

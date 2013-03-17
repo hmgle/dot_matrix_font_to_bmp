@@ -285,6 +285,59 @@ bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
 	return dst;
 }
 
+/* 
+ * 水平合并支持垂直分辨率不同位图
+ * 垂直分辨率较小的位图上边将补齐空白
+ */
+bmp_file_t *
+bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
+{
+	uint32_t h_diff;
+	uint32_t rowsize;
+	bmp_file_t bmp_blank;
+	bmp_file_t tmp_bmp;
+
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+		return dst;
+	} 
+	/*
+	 * else 
+	 */
+	if (dst->dib_h.height > add->dib_h.height) {
+		h_diff = dst->dib_h.height - add->dib_h.height;
+		rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4;
+		bmp_blank.pdata = malloc(rowsize * h_diff);
+		create_blank_bmp(&bmp_blank, add->dib_h.width, h_diff, dst->dib_h.bits_per_pix, color_anti_flag);
+		memcpy(&tmp_bmp, &bmp_blank, sizeof(tmp_bmp));
+		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
+		memcpy(tmp_bmp.pdata, bmp_blank.pdata, tmp_bmp.dib_h.image_size);
+		bmp_v_combin_2(&tmp_bmp, add);
+		bmp_h_combin_2(dst, &tmp_bmp);
+
+		free(tmp_bmp.pdata);
+		free(bmp_blank.pdata);
+	} else if (dst->dib_h.height < add->dib_h.height) {
+		h_diff = add->dib_h.height - dst->dib_h.height;
+		rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4;
+		bmp_blank.pdata = malloc(rowsize * h_diff);
+		create_blank_bmp(&bmp_blank, dst->dib_h.width, h_diff, dst->dib_h.bits_per_pix, color_anti_flag);
+		bmp_v_combin_2(&bmp_blank, dst);
+		bmp_h_combin_2(&bmp_blank, add);
+		memcpy(&dst->bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
+		memcpy(&dst->dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
+		dst->pdata = realloc(dst->pdata, dst->dib_h.image_size);
+		memcpy(dst->pdata, bmp_blank.pdata, dst->dib_h.image_size);
+
+		free(bmp_blank.pdata);
+	} else
+		bmp_h_combin_2(dst, add);
+
+	return dst;
+}
+
 /*
  * 合并的位图水平分辨率相同才能调用该函数
  */

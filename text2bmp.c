@@ -167,6 +167,16 @@ int main(int argc, char **argv)
 			memset(bmp_char.pdata, 0, image_size);
 			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp_char, bits_per_pix, color_anti_flag);
 			bmp_h_combin_2(&bmp_line, &bmp_char);
+			if (style.character_spacing > 0) {
+				create_blank_bmp(&bmp_blank, 
+						style.character_spacing, 
+						1, 
+						bits_per_pix, 
+						color_anti_flag);
+				debug_print();
+				bmp_h_combin_3(&bmp_line, &bmp_blank, color_anti_flag);
+				debug_print();
+			}
 		} /* for (;;) */
 		bmp_v_combin_3(&bmp_all, &bmp_line, color_anti_flag);
 		if (style.line_spacing > 0) {
