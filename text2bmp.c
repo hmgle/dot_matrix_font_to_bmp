@@ -87,6 +87,8 @@ int main(int argc, char **argv)
 					"[-i line_spacing] "
 					"[-c character_spacing] "
 					"[-m max_line_length] "
+					"[-b bits_per_pix] "
+					"[-o] "
 					"[inputfile]\n", argv[0]);
 			exit(1);
 		}
@@ -193,6 +195,50 @@ int main(int argc, char **argv)
 		}
 		memset(&bmp_line, 0, sizeof(bmp_line));
 	} /* while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) */
+
+	/*
+	 * 格式处理
+	 */
+	if (style.left_margin > 0) {
+		create_blank_bmp(&bmp_blank, 
+				style.left_margin, 
+				1, 
+				bits_per_pix, 
+				color_anti_flag);
+		bmp_h_combin_3(&bmp_blank, &bmp_all, color_anti_flag);
+		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
+		memcpy(&bmp_all.dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
+		bmp_all.pdata = realloc(bmp_all.pdata, bmp_all.dib_h.image_size);
+		memcpy(bmp_all.pdata, bmp_blank.pdata, bmp_all.dib_h.image_size);
+	}
+	if (style.right_margin > 0) {
+		create_blank_bmp(&bmp_blank, 
+				style.right_margin, 
+				1, 
+				bits_per_pix, 
+				color_anti_flag);
+		bmp_h_combin_3(&bmp_all, &bmp_blank, color_anti_flag);
+	}
+	if (style.up_margin > 0) {
+		create_blank_bmp(&bmp_blank, 
+				1, 
+				style.up_margin, 
+				bits_per_pix, 
+				color_anti_flag);
+		bmp_v_combin_3(&bmp_blank, &bmp_all, color_anti_flag);
+		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
+		memcpy(&bmp_all.dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
+		bmp_all.pdata = realloc(bmp_all.pdata, bmp_all.dib_h.image_size);
+		memcpy(bmp_all.pdata, bmp_blank.pdata, bmp_all.dib_h.image_size);
+	}
+	if (style.down_margin > 0) {
+		create_blank_bmp(&bmp_blank, 
+				1, 
+				style.down_margin, 
+				bits_per_pix, 
+				color_anti_flag);
+		bmp_v_combin_3(&bmp_all, &bmp_blank, color_anti_flag);
+	}
 
 	/*
 	 * output
