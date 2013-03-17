@@ -66,6 +66,36 @@ utf8tounicode(const uint8_t *src, uint8_t *dst)
 	return length;
 }
 
+char *
+fgets_utf8(char *s, int n, FILE *stream)
+{
+	int c;
+	int length;
+	char *cs = s;
+
+	while (--n > 0) {
+		c = getc(stream);
+		if (c == EOF || ((*cs++ = c) == '\n'))
+			break;
+		length = get_utf8_length((const uint8_t *)&c);
+		switch (length) {
+		case 1:
+			break;
+		case 4:
+			*cs++ = getc(stream);
+		case 3:
+			*cs++ = getc(stream);
+		case 2:
+			*cs++ = getc(stream);
+			break;
+		default:
+			break;
+		}
+	}
+	*cs = '\0';
+	return (c == EOF && cs == s) ? NULL : s;
+}
+
 uint16_t
 unicode_to_gb2312(uint16_t unicode, const uint16_t *mem_gb2312, int gb2312_num)
 {
