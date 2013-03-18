@@ -15,11 +15,12 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
     make
 
 所生成的文件有：
-* utf8togb2312:	将utf-8编码转换为gb2312编码的程序;
-* gb2312tobmps:	从gb2312编码的字符串流生成位图流;
-* bmps2bmp:	把位图流的头两个位图水平合并为一个位图，剩余的不处理;
-* bmpsall2bmp:	把位图流的所有位图水平合并为一个位图.
-* bmpsallv2bmp:	把位图流的所有位图垂直合并为一个位图.
+* utf8togb2312:	将utf-8编码转换为gb2312编码的程序。
+* gb2312tobmps:	从gb2312编码的字符串流生成位图流。
+* bmps2bmp:	把位图流的头两个位图水平合并为一个位图，剩余的不处理。
+* bmpsall2bmp:	把位图流的所有位图水平合并为一个位图。
+* bmpsallv2bmp:	把位图流的所有位图垂直合并为一个位图。
+* text2bmp:	接收utf-8编码文本，输出相应位图的程序。
 
 水平合并位图时目前仅支持垂直分辨率一致.
 垂直合并位图时目前仅支持水平分辨率一致.
@@ -52,6 +53,23 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 
 ![poem.bmp](poem.bmp)
+
+直接读入文件并生成相应位图：
+
+    cat test3.txt
+    当我们在雨中行驶时，
+    我能够看出他逐渐变得有些怏怏不乐。
+    我否定的不仅仅是一些错误的说法，
+    而是他内心生活中蕴藏着的宝贵的东西。
+
+    卡尔.萨根 魔鬼出没的世界
+
+    ./text2bmp -o -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
+
+
+生成的位图：
+
+![test3.bmp](test3.bmp)
 
 ##  用途
 

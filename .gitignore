@@ -4,6 +4,7 @@
 *.tmp
 !test1.bmp
 !test2.bmp
+!test3.bmp
 !poem.bmp
 test
 gb2312tobmp
