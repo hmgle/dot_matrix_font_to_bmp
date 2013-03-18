@@ -62,7 +62,7 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
     我否定的不仅仅是一些错误的说法，
     而是他内心生活中蕴藏着的宝贵的东西。
 
-    卡尔.萨根 魔鬼出没的世界
+        卡尔.萨根 魔鬼出没的世界
 
     ./text2bmp -o -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
 
