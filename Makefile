@@ -17,9 +17,9 @@ SRC := test.c utf8togb2312.c gb2312tobmps.c bmps2bmp.c bmpsall2bmp.c bmpsallv2bm
 ODIR := obj
 OBJ  := $(patsubst %.c,$(ODIR)/%.o,$(SRC))
 
-TARGET = test utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp bmpsallv2bmp \
+TARGET = utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp bmpsallv2bmp \
 	 text2bmp
-TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test
+TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test test
 
 all: $(TARGET)
 
