@@ -14,3 +14,6 @@ bmps2bmp
 bmpsall2bmp
 bmpsallv2bmp
 test_bmp_h_combin
+text2bmp
+combin_v_3_test
+create_blank_bmp_test

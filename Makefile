@@ -12,31 +12,49 @@ else
 	CFLAGS += -DDEBUG=0
 endif
 
+SRC := test.c utf8togb2312.c gb2312tobmps.c bmps2bmp.c bmpsall2bmp.c bmpsallv2bmp.c text2bmp.c dot_matrix_font_to_bmp.c
+
+ODIR := obj
+OBJ  := $(patsubst %.c,$(ODIR)/%.o,$(SRC))
+
 TARGET = test utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp bmpsallv2bmp \
 	 text2bmp
 TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test
 
-all: $(TARGET) $(TMPTARGET)
+all: $(TARGET)
 
-test: test.o dot_matrix_font_to_bmp.o
 
-utf8togb2312: utf8togb2312.o encoding_convert.o
+test: $(ODIR)/test.o $(ODIR)/dot_matrix_font_to_bmp.o
 
-gb2312tobmps: gb2312tobmps.o dot_matrix_font_to_bmp.o
+utf8togb2312: $(ODIR)/utf8togb2312.o $(ODIR)/encoding_convert.o
 
-test_bmp_h_combin: test_bmp_h_combin.o dot_matrix_font_to_bmp.o
+gb2312tobmps: $(ODIR)/gb2312tobmps.o $(ODIR)/dot_matrix_font_to_bmp.o
 
-create_blank_bmp_test: create_blank_bmp_test.o dot_matrix_font_to_bmp.o bmp_io.o
+test_bmp_h_combin: $(ODIR)/test_bmp_h_combin.o $(ODIR)/dot_matrix_font_to_bmp.o
 
-bmps2bmp: bmps2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
+create_blank_bmp_test: $(ODIR)/create_blank_bmp_test.o $(ODIR)/dot_matrix_font_to_bmp.o bmp_io.o
 
-bmpsall2bmp: bmpsall2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
+bmps2bmp: $(ODIR)/bmps2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
 
-bmpsallv2bmp: bmpsallv2bmp.o dot_matrix_font_to_bmp.o bmp_io.o
+bmpsall2bmp: $(ODIR)/bmpsall2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
 
-text2bmp: text2bmp.o dot_matrix_font_to_bmp.o encoding_convert.o bmp_io.o
+bmpsallv2bmp: $(ODIR)/bmpsallv2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
 
-combin_v_3_test: combin_v_3_test.o dot_matrix_font_to_bmp.o bmp_io.o
+text2bmp: $(ODIR)/text2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/encoding_convert.o $(ODIR)/bmp_io.o
+
+combin_v_3_test: $(ODIR)/combin_v_3_test.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
+
+$(OBJ): Makefile | $(ODIR)
+
+$(ODIR):
+	@mkdir $@
+
+$(ODIR)/%.o : %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	-rm -f *.o $(TARGET)
+	-rm -f *.o $(TARGET) obj/*
+
+vpath %.c src
+vpath %.h src
+vpath %.o obj
