@@ -12,7 +12,8 @@ else
 	CFLAGS += -DDEBUG=0
 endif
 
-SRC := test.c utf8togb2312.c gb2312tobmps.c bmps2bmp.c bmpsall2bmp.c bmpsallv2bmp.c text2bmp.c dot_matrix_font_to_bmp.c
+SRCDIR = src
+SRC := $(wildcard $(SRCDIR)/*.c)
 
 ODIR := obj
 OBJ  := $(patsubst %.c,$(ODIR)/%.o,$(SRC))
