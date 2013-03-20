@@ -97,9 +97,8 @@ int main(int argc, char **argv)
 			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
 		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) { /* ascii */
 			offset = ascii_to_fontoffset(gb2312buf[i]);
-			debug_print("offset = %#x", offset);
-			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp, bits_per_pix, color_anti_flag);
 			i++;
+			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp, bits_per_pix, color_anti_flag);
 		} else
 			break;
 
@@ -124,11 +123,17 @@ int main(int argc, char **argv)
 		free(bmp.pdata);
 		bmp.pdata = NULL;
 	}
+	ret = munmap(addr_ascii_fd_in, (size_t) ascii_fd_stat.st_size);
+	if (ret == -1) {
+		perror("munmap");
+		exit(1);
+	}
 	ret = munmap(addr_fd_in, (size_t) fd_stat.st_size);
 	if (ret == -1) {
 		perror("munmap");
 		exit(1);
 	}
+	close(ascii_fd);
 	close(font_fd);
 	return 0;
 }

@@ -11,6 +11,7 @@
 #include "debug_log.h"
 
 #define GB2312_HZK	"gb2312.hzk"
+#define ASCII_HZK	"ASC16"
 #define FONT_BMP_SIZE	1024
 
 struct text_style {
@@ -41,6 +42,9 @@ int main(int argc, char **argv)
 	uint8_t *addr_fd_in;
 	struct stat fd_stat;
 	int font_fd;
+	int ascii_fd;
+	struct stat ascii_fd_stat;
+	uint8_t *addr_ascii_fd_in;
 	int once_read;
 	int i;
 	uint32_t offset;
@@ -48,7 +52,6 @@ int main(int argc, char **argv)
 	bmp_file_t bmp_line;
 	bmp_file_t bmp_all;
 	bmp_file_t bmp_blank;
-	uint32_t image_size;
 	int ret;
 
 	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o")) != -1) {
@@ -103,7 +106,9 @@ int main(int argc, char **argv)
 			return 1;
 		}
 	}
+
 	mem_addr = mem_gb2312("./GB2312", &gb2312_num);
+
 	font_fd = open(GB2312_HZK, O_RDONLY);
 	if (font_fd < 0) {
 		perror("open");
@@ -117,6 +122,23 @@ int main(int argc, char **argv)
 	addr_fd_in = mmap(NULL, (size_t) fd_stat.st_size,
 			  PROT_READ, MAP_PRIVATE, font_fd, (off_t) 0);
 	if (addr_fd_in == MAP_FAILED) {
+		perror("mmap");
+		exit(1);
+	}
+
+	ascii_fd = open(ASCII_HZK, O_RDONLY);
+	if (ascii_fd < 0) {
+		perror("open");
+		exit(1);
+	}
+	ret = fstat(ascii_fd, &ascii_fd_stat);
+	if (ret == -1) {
+		perror("fstat");
+		exit(1);
+	}
+	addr_ascii_fd_in = mmap(NULL, (size_t) ascii_fd_stat.st_size,
+			  PROT_READ, MAP_PRIVATE, ascii_fd, (off_t) 0);
+	if (addr_ascii_fd_in == MAP_FAILED) {
 		perror("mmap");
 		exit(1);
 	}
@@ -162,16 +184,19 @@ int main(int argc, char **argv)
 			if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
 				offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
 				i += 2;
+				set_header(&bmp_char, 16, 16, bits_per_pix);
+				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
+				fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp_char, bits_per_pix, color_anti_flag);
+
 			} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
-				offset = gb2312code_to_fontoffset(0xa1a3 + 0x100 * (gb2312buf[i] - 0x21));
+				offset = ascii_to_fontoffset(gb2312buf[i]);
 				i++;
+				set_header(&bmp_char, 8, 16, bits_per_pix);
+				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
+				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp_char, bits_per_pix, color_anti_flag);
 			} else
 				break;
 
-			set_header(&bmp_char, 16, 16, bits_per_pix);
-			image_size = bmp_char.dib_h.image_size;
-			memset(bmp_char.pdata, 0, image_size);
-			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp_char, bits_per_pix, color_anti_flag);
 			bmp_h_combin_2(&bmp_line, &bmp_char);
 			if (style.character_spacing > 0) {
 				create_blank_bmp(&bmp_blank, 
@@ -265,11 +290,17 @@ int main(int argc, char **argv)
 		free(bmp_line.pdata);
 		bmp_line.pdata = NULL;
 	}
+	ret = munmap(addr_ascii_fd_in, (size_t) ascii_fd_stat.st_size);
+	if (ret == -1) {
+		perror("munmap");
+		exit(1);
+	}
 	ret = munmap(addr_fd_in, (size_t) fd_stat.st_size);
 	if (ret == -1) {
 		perror("munmap");
 		exit(1);
 	}
+	close(ascii_fd);
 	close(font_fd);
 	unmem_gb2312(mem_addr);
 	if (in != stdin)
