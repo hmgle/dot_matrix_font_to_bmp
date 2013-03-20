@@ -28,7 +28,6 @@ int main(int argc, char **argv)
 	uint8_t gb2312buf[MAX_LINE * 2];
 	uint32_t offset;
 	bmp_file_t bmp;
-	uint32_t image_size;
 	int ret;
 	char *pret;
 	int color_anti_flag = 0;
@@ -87,13 +86,11 @@ int main(int argc, char **argv)
 	}
 
 	i = 0;
+	memset(&bmp, 0, sizeof(bmp));
+	set_header(&bmp, 16, 16, bits_per_pix);
+	bmp.pdata = malloc(bmp.dib_h.image_size);
+	memset(bmp.pdata, 0, bmp.dib_h.image_size);
 	for (;;) {
-		memset(&bmp, 0, sizeof(bmp));
-		set_header(&bmp, 16, 16, bits_per_pix);
-		image_size = bmp.dib_h.image_size;
-		bmp.pdata = malloc(image_size);
-		memset(bmp.pdata, 0, image_size);
-
 		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
 			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
 			i += 2;
@@ -116,7 +113,7 @@ int main(int argc, char **argv)
 			perror("fwrite");
 			exit(1);
 		}
-		ret = fwrite(bmp.pdata, sizeof(uint8_t), image_size, stdout);
+		ret = fwrite(bmp.pdata, sizeof(uint8_t), bmp.dib_h.image_size, stdout);
 		if (ret < 0) {
 			perror("fwrite");
 			exit(1);
