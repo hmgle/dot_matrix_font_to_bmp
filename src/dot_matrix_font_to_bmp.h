@@ -43,6 +43,7 @@ void get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_hea
 void conv_row(const uint8_t *ptrfontdata, uint32_t width, uint8_t *pdest, uint16_t bits_per_pix, int color_anti_flag);
 void fontdata2bmp(const uint8_t *ptrfontdata, uint32_t width, uint32_t hegiht, bmp_file_t *ptrbmp, uint16_t bits_per_pix, int color_anti_flag);
 uint32_t gb2312code_to_fontoffset(uint32_t gb2312code);
+uint32_t ascii_to_fontoffset(uint32_t ascii);
 
 bmp_file_t *create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix, int color_anti_flag);
 bmp_file_t *bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);

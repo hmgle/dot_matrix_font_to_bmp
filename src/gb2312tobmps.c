@@ -13,14 +13,18 @@
 #endif
 
 #define GB2312_HZK	"gb2312.hzk"
+#define ASCII_HZK	"ASC16"
 
 int main(int argc, char **argv)
 {
 	int opt;
 	int font_fd;
 	struct stat fd_stat;
+	int ascii_fd;
+	struct stat ascii_fd_stat;
 	uint32_t bits_per_pix = 16;
 	uint8_t *addr_fd_in;
+	uint8_t *addr_ascii_fd_in;
 	uint8_t gb2312buf[MAX_LINE * 2];
 	uint32_t offset;
 	bmp_file_t bmp;
@@ -65,24 +69,42 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
+	ascii_fd = open(ASCII_HZK, O_RDONLY);
+	if (ascii_fd < 0) {
+		perror("open");
+		exit(1);
+	}
+	ret = fstat(ascii_fd, &ascii_fd_stat);
+	if (ret == -1) {
+		perror("fstat");
+		exit(1);
+	}
+	addr_ascii_fd_in = mmap(NULL, (size_t) ascii_fd_stat.st_size,
+			  PROT_READ, MAP_PRIVATE, ascii_fd, (off_t) 0);
+	if (addr_ascii_fd_in == MAP_FAILED) {
+		perror("mmap");
+		exit(1);
+	}
+
 	i = 0;
 	for (;;) {
-		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
-			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
-			i += 2;
-		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
-			offset = gb2312code_to_fontoffset(0xa1a3 + 0x100 * (gb2312buf[i] - 0x21));
-			i++;
-		} else
-			break;
-
-		debug_print("offset = %#x", offset);
 		memset(&bmp, 0, sizeof(bmp));
 		set_header(&bmp, 16, 16, bits_per_pix);
 		image_size = bmp.dib_h.image_size;
 		bmp.pdata = malloc(image_size);
 		memset(bmp.pdata, 0, image_size);
-		fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
+
+		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
+			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
+			i += 2;
+			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
+		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) { /* ascii */
+			offset = ascii_to_fontoffset(gb2312buf[i]);
+			debug_print("offset = %#x", offset);
+			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp, bits_per_pix, color_anti_flag);
+			i++;
+		} else
+			break;
 
 		ret = fwrite(&bmp.bmp_h, sizeof(bmp_file_header_t), 1, stdout);
 		if (ret < 0) {

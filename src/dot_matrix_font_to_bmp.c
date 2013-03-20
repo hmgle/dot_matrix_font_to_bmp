@@ -135,6 +135,12 @@ gb2312code_to_fontoffset(uint32_t gb2312code)
 	return fontoffset;
 }
 
+uint32_t 
+ascii_to_fontoffset(uint32_t ascii)
+{
+	return (ascii * 16) + 1;
+}
+
 bmp_file_t *
 create_blank_bmp(bmp_file_t *dst, 
 		uint32_t w, uint32_t h, 
