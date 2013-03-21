@@ -72,14 +72,16 @@ fgets_utf8(char *s, int n, FILE *stream)
 	int c;
 	int length;
 	char *cs = s;
+	int fix_n = 2 * n - 2;
 
-	while (--n > 0) {
+	while (fix_n > 1) {
 		c = getc(stream);
 		if (c == EOF || ((*cs++ = c) == '\n'))
 			break;
 		length = get_utf8_length((const uint8_t *)&c);
 		switch (length) {
 		case 1:
+			fix_n--;
 			break;
 		case 4:
 			*cs++ = getc(stream);
@@ -87,6 +89,7 @@ fgets_utf8(char *s, int n, FILE *stream)
 			*cs++ = getc(stream);
 		case 2:
 			*cs++ = getc(stream);
+			fix_n -= 2;
 			break;
 		default:
 			break;
