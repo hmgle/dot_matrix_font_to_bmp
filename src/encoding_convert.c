@@ -10,25 +10,18 @@ static inline uint8_t hex_ch_to_val(char hex_ch);
 int 
 get_utf8_length(const uint8_t *src)
 {
-	int length;
-
 	switch (*src) {
 	case 0x0 ... 0x7f:
-		length = 1;
-		break;
+		return 1;
 	case 0xC0 ... 0xDF:
-		length = 2;
-		break;
+		return 2;
 	case 0xE0 ... 0xEF:
-		length = 3;
-		break;
+		return 3;
 	case 0xF0 ... 0xF7:
-		length = 4;
-		break;
+		return 4;
 	default:
-		length = -1;
+		return -1;
 	}
-	return length;
 }
 
 int
