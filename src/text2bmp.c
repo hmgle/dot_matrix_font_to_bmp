@@ -24,6 +24,25 @@ struct text_style {
 	uint32_t max_line_length;
 };
 
+static void show_usage(const char *pro_name);
+
+static void show_usage(const char *pro_name)
+{
+	fprintf(stderr, "Usage: %s [Options] [inputfile]\n", pro_name);
+	fprintf(stderr, "\n");
+	fprintf(stderr, "Options:\n");
+	fprintf(stderr, "        -l val        set left margin\n");
+	fprintf(stderr, "        -r val        set right margin\n");
+	fprintf(stderr, "        -u val        set top margin\n");
+	fprintf(stderr, "        -d val        set bottom margin\n");
+	fprintf(stderr, "        -i val        set line spacing\n");
+	fprintf(stderr, "        -c val        set character spacing\n");
+	fprintf(stderr, "        -m val        set max line length\n");
+	fprintf(stderr, "        -b val        set bits_per_pix\n");
+	fprintf(stderr, "        -o            anti_color\n");
+	fprintf(stderr, "\n");
+}
+
 int main(int argc, char **argv)
 {
 	int opt;
@@ -84,16 +103,7 @@ int main(int argc, char **argv)
 			color_anti_flag = 1;
 			break;
 		default:
-			fprintf(stderr, "Usage: %s [-l left_margin] "
-					"[-r right_margin] "
-					"[-u up_margin] "
-					"[-d down_margin] "
-					"[-i line_spacing] "
-					"[-c character_spacing] "
-					"[-m max_line_length] "
-					"[-b bits_per_pix] "
-					"[-o] "
-					"[inputfile]\n", argv[0]);
+			show_usage(argv[0]);
 			exit(1);
 		}
 	} /* while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o:")) != -1) */
