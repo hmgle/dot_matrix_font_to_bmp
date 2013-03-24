@@ -43,33 +43,37 @@ get_utf8_length(const uint8_t *src)
 int
 is_utf8(const uint8_t *str, size_t len)
 {
-    size_t i = 0;
-    size_t continuation_bytes = 0;
+	size_t i = 0;
+	size_t continuation_bytes = 0;
 
-    while (i < len)
-    {
-        if (str[i] <= 0x7F)
-            continuation_bytes = 0;
-        else if (str[i] >= 0xC0 /*11000000*/ && str[i] <= 0xDF /*11011111*/)
-            continuation_bytes = 1;
-        else if (str[i] >= 0xE0 /*11100000*/ && str[i] <= 0xEF /*11101111*/)
-            continuation_bytes = 2;
-        else if (str[i] >= 0xF0 /*11110000*/ && str[i] <= 0xF4 /* Cause of RFC 3629 */)
-            continuation_bytes = 3;
-        else
-            return i + 1;
-        i += 1;
-        while (i < len && continuation_bytes > 0
-               && str[i] >= 0x80
-               && str[i] <= 0xBF)
-        {
-            i += 1;
-            continuation_bytes -= 1;
-        }
-        if (continuation_bytes != 0)
-            return i + 1;
-    }
-    return 0;
+	while (i < len) {
+		switch (str[i]) {
+		case 0x0 ... 0x7f:
+			continuation_bytes = 0;
+			break;
+		case 0xC0 ... 0xDF:
+			continuation_bytes = 1;
+			break;
+		case 0xE0 ... 0xEF:
+			continuation_bytes = 2;
+			break;
+		case 0xF0 ... 0xF4: /* Cause of RFC 3629 */
+			continuation_bytes = 3;
+			break;
+		default:
+			return i + 1;
+		}
+		i += 1;
+		while (i < len && continuation_bytes > 0
+			&& str[i] >= 0x80
+			&& str[i] <= 0xBF) {
+			i += 1;
+			continuation_bytes -= 1;
+		}
+		if (continuation_bytes != 0)
+			return i + 1;
+	}
+	return 0;
 }
 
 int
