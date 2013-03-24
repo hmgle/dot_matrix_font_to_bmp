@@ -5,6 +5,7 @@ CFLAGS = -Wall -O2
 
 CROSS:=
 CC = $(CROSS)gcc
+STRIP = $(CROSS)strip
 
 ifeq ($(DEBUG), 1)
 	CFLAGS += -DDEBUG=1
@@ -24,6 +25,8 @@ TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test test
 
 all: $(TARGET)
 
+strip_target: all
+	$(STRIP) $(TARGET)
 
 test: $(ODIR)/test.o $(ODIR)/dot_matrix_font_to_bmp.o
 

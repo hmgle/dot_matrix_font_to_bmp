@@ -131,7 +131,7 @@ gb2312code_to_fontoffset(uint32_t gb2312code)
 
 	fontoffset = (gb2312code % 0x100 - 0xA1) * 94
 		     + (gb2312code / 0x100 - 0xA1);
-	fontoffset *= 32;
+	fontoffset *= 32; /* for HZK16 */
 	return fontoffset;
 }
 

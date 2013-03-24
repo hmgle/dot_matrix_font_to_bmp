@@ -15,6 +15,7 @@
 #endif
 
 int get_utf8_length(const uint8_t *src);
+int is_utf8(const uint8_t *string, size_t len);
 int utf8tounicode(const uint8_t *src, uint8_t *dst);
 char *fgets_utf8(char *s, int n, FILE *stream);
 uint16_t unicode_to_gb2312(uint16_t unicode, const uint16_t *mem_gb2312, int gb2312_num);
