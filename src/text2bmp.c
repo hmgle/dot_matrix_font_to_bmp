@@ -234,7 +234,7 @@ int main(int argc, char **argv)
 			bmp_line.pdata = NULL;
 		}
 		memset(&bmp_line, 0, sizeof(bmp_line));
-	} /* while (fgets((char *)linebuf, sizeof(linebuf) - 1, in)) */
+	} /* while (fgets_utf8((char *)linebuf, sizeof(linebuf) - 1, in)) */
 
 	/*
 	 * 格式处理

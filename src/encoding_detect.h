@@ -3,6 +3,7 @@
 
 #include "debug_log.h"
 #include <stdio.h>
+#include <stdint.h>
 
 #ifndef MAX_LINE
 #define MAX_LINE	1024
