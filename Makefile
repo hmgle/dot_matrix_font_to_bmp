@@ -8,7 +8,7 @@ CC = $(CROSS)gcc
 STRIP = $(CROSS)strip
 
 ifeq ($(DEBUG), 1)
-	CFLAGS += -DDEBUG=1
+	CFLAGS += -Wextra -DDEBUG=1
 else
 	CFLAGS += -DDEBUG=0
 endif

@@ -6,18 +6,19 @@
 int
 read_and_alloc_one_bmp(FILE *fp, bmp_file_t *ptrbmp)
 {
-	size_t ret;
+	size_t numread;
 
-	ret = fread(&ptrbmp->bmp_h, sizeof(struct bmp_file_header), 1, fp);
-	if (ret < 0)
+	numread = fread(&ptrbmp->bmp_h, sizeof(struct bmp_file_header), 1, fp);
+	if (!numread)
 		return -1;
-	ret = fread(&ptrbmp->dib_h, sizeof(struct dib_header), 1, fp);
-	if (ret < 0)
+	numread = fread(&ptrbmp->dib_h, sizeof(struct dib_header), 1, fp);
+	if (!numread)
 		return -1;
 
+	assert(ptrbmp->dib_h.image_size > 0);
 	ptrbmp->pdata = malloc(ptrbmp->dib_h.image_size);
-	ret = fread(ptrbmp->pdata, 1, ptrbmp->dib_h.image_size, fp);
-	if (ret < 0)
+	numread = fread(ptrbmp->pdata, 1, ptrbmp->dib_h.image_size, fp);
+	if (!numread)
 		return -1;
 	return 0;
 }

@@ -48,7 +48,7 @@ conv_row(const uint8_t *ptrfontdata,
 	 uint16_t bits_per_pix,
 	 int color_anti_flag)
 {
-	int i;
+	uint32_t i;
 	int char_num;
 	int char_bit;
 	char bit;
@@ -164,7 +164,7 @@ create_blank_bmp(bmp_file_t *dst,
 bmp_file_t *
 bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst)
 {
-	int i;
+	uint32_t i;
 	uint32_t rowsize;
 	uint32_t rowsize_src1;
 	uint32_t rowsize_src2;

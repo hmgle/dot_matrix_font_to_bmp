@@ -46,7 +46,7 @@ static void show_usage(const char *pro_name)
 int main(int argc, char **argv)
 {
 	int opt;
-	struct text_style style = {0};
+	struct text_style style;
 	uint32_t bits_per_pix = 16;
 	int color_anti_flag = 0;
 	FILE *in = stdin;
@@ -73,6 +73,7 @@ int main(int argc, char **argv)
 	bmp_file_t bmp_blank;
 	int ret;
 
+	memset(&style, 0, sizeof(struct text_style));
 	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o")) != -1) {
 		switch (opt) {
 		case 'l': /* 左边距 */
