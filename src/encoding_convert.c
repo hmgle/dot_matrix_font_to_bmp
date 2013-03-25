@@ -30,6 +30,7 @@ get_utf8_length(const uint8_t *src)
  *
  * Return value :
  * If the string is valid utf-8, 0 is returned.
+ * IF -1 returned, it is very likely valid utf-8.
  * Else the position, starting from 1, is returned.
  *
  * Valid utf-8 sequences look like this :
@@ -45,6 +46,7 @@ is_utf8(const uint8_t *str, size_t len)
 {
 	size_t i = 0;
 	size_t continuation_bytes = 0;
+	int quick_flag = 0;
 
 	while (i < len) {
 		switch (str[i]) {
@@ -59,6 +61,7 @@ is_utf8(const uint8_t *str, size_t len)
 			break;
 		case 0xF0 ... 0xF4: /* Cause of RFC 3629 */
 			continuation_bytes = 3;
+			quick_flag = 1;
 			break;
 		default:
 			return i + 1;
@@ -72,6 +75,8 @@ is_utf8(const uint8_t *str, size_t len)
 		}
 		if (continuation_bytes != 0)
 			return i + 1;
+		else if (quick_flag)
+			return -1;
 	}
 	return 0;
 }

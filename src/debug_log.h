@@ -10,8 +10,10 @@ char DEBUG_STRING[1024];
 #else
 FILE *DEBUG_LOG_FILE;
 char *DEBUG_STRING;
+#ifndef NDEBUG
 #define NDEBUG
-#endif
+#endif /* #ifndef NDEBUG */
+#endif /* #if DEBUG */
 #include <assert.h>
 
 #define debug_print(fmt, ...) \
