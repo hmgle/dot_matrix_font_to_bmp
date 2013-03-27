@@ -15,6 +15,7 @@ enum file_encoding_type {
 	GBK,
 };
 
+int is_utf8(const uint8_t *string, size_t len);
 int detect_file_encoding(FILE *text_fp);
 
 #endif /* #ifndef _ENCODING_DETECT_H */
