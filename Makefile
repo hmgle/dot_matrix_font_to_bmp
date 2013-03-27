@@ -23,10 +23,12 @@ TARGET = utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp bmpsallv2bmp \
 	 text2bmp
 TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test test
 
-all: $(TARGET)
+all: $(TARGET) test_encoding_detect
 
 strip_target: all
 	$(STRIP) $(TARGET)
+
+test_encoding_detect: $(ODIR)/test_encoding_detect.o $(ODIR)/encoding_detect.o $(ODIR)/encoding_convert.o
 
 test: $(ODIR)/test.o $(ODIR)/dot_matrix_font_to_bmp.o
 
@@ -44,7 +46,7 @@ bmpsall2bmp: $(ODIR)/bmpsall2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_
 
 bmpsallv2bmp: $(ODIR)/bmpsallv2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
 
-text2bmp: $(ODIR)/text2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/encoding_convert.o $(ODIR)/bmp_io.o
+text2bmp: $(ODIR)/text2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/encoding_convert.o $(ODIR)/bmp_io.o $(ODIR)/encoding_detect.o
 
 combin_v_3_test: $(ODIR)/combin_v_3_test.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
 

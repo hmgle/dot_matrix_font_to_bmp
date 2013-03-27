@@ -7,6 +7,7 @@
 #include <sys/mman.h>
 #include "dot_matrix_font_to_bmp.h"
 #include "encoding_convert.h"
+#include "encoding_detect.h"
 #include "bmp_io.h"
 #include "debug_log.h"
 
@@ -71,6 +72,7 @@ int main(int argc, char **argv)
 	bmp_file_t bmp_line;
 	bmp_file_t bmp_all;
 	bmp_file_t bmp_blank;
+	int encoding_type = UTF8_NO_BOM;
 	int ret;
 
 	memset(&style, 0, sizeof(struct text_style));
@@ -116,6 +118,7 @@ int main(int argc, char **argv)
 				argv[optind], strerror(errno));
 			return 1;
 		}
+		encoding_type = detect_file_encoding(in);
 	}
 
 	mem_addr = mem_gb2312("./GB2312", &gb2312_num);
@@ -163,29 +166,36 @@ int main(int argc, char **argv)
 
 	once_read = (style.max_line_length > 0) 
 			? (style.max_line_length + 1) : (sizeof(linebuf) - 1);
-	while (fgets_utf8((char *)linebuf, once_read, in)) {
-		ptr_gb2312 = gb2312buf;
-		ptr = linebuf;
-		if (*ptr == '\n')
-			*ptr = ' ';
-		while (*ptr) {
-			ret = utf8tounicode(ptr, unicode);
-			if (ret < 0) {
-				debug_print("utf8tounicode return %d\n", ret);
-				exit(1);
+	// while (fgets_utf8((char *)linebuf, once_read, in)) {
+	for(;;) {
+		if (encoding_type == UTF8_NO_BOM) {
+			if (fgets_utf8((char *)linebuf, once_read, in) == NULL)
+				break;
+			ptr_gb2312 = gb2312buf;
+			ptr = linebuf;
+			if (*ptr == '\n')
+				*ptr = ' ';
+			while (*ptr) {
+				ret = utf8tounicode(ptr, unicode);
+				if (ret < 0) {
+					debug_print("utf8tounicode return %d\n", ret);
+					exit(1);
+				}
+				ptr += ret;
+				gb2312_code = unicode_to_gb2312(unicode[0] + unicode[1] * 0x100, 
+								mem_addr, 
+								gb2312_num);
+				ptr_gb2312[0] = gb2312_code % 0x100;
+				if (gb2312_code / 0x100 > 0) {
+					ptr_gb2312[1] = gb2312_code / 0x100;
+					ptr_gb2312 += 2;
+				} else
+					ptr_gb2312 += 1;
 			}
-			ptr += ret;
-			gb2312_code = unicode_to_gb2312(unicode[0] + unicode[1] * 0x100, 
-							mem_addr, 
-							gb2312_num);
-			ptr_gb2312[0] = gb2312_code % 0x100;
-			if (gb2312_code / 0x100 > 0) {
-				ptr_gb2312[1] = gb2312_code / 0x100;
-				ptr_gb2312 += 2;
-			} else
-				ptr_gb2312 += 1;
+			ptr_gb2312[0] = '\0';
+		} else if (encoding_type == GBK) {
+
 		}
-		ptr_gb2312[0] = '\0';
 
 		/*
 		 * gb2312tobmps
