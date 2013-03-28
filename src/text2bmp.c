@@ -166,9 +166,14 @@ int main(int argc, char **argv)
 
 	once_read = (style.max_line_length > 0) 
 			? (style.max_line_length + 1) : (sizeof(linebuf) - 1);
-	// while (fgets_utf8((char *)linebuf, once_read, in)) {
+	if (encoding_type == UTF8_WITH_BOM) {
+		if (fseek(in, 3, SEEK_SET)) {
+			debug_print("fseek failed: %s", strerror(errno));
+			exit(errno);
+		}
+	}
 	for(;;) {
-		if (encoding_type == UTF8_NO_BOM) {
+		if (encoding_type == UTF8_NO_BOM || encoding_type == UTF8_WITH_BOM) {
 			if (fgets_utf8((char *)linebuf, once_read, in) == NULL)
 				break;
 			ptr_gb2312 = gb2312buf;
@@ -193,9 +198,8 @@ int main(int argc, char **argv)
 					ptr_gb2312 += 1;
 			}
 			ptr_gb2312[0] = '\0';
-		} else if (encoding_type == UTF8_WITH_BOM) {
-
 		} else if (encoding_type == GBK) {
+
 		}
 
 		/*
