@@ -193,8 +193,9 @@ int main(int argc, char **argv)
 					ptr_gb2312 += 1;
 			}
 			ptr_gb2312[0] = '\0';
-		} else if (encoding_type == GBK) {
+		} else if (encoding_type == UTF8_WITH_BOM) {
 
+		} else if (encoding_type == GBK) {
 		}
 
 		/*
@@ -215,19 +216,24 @@ int main(int argc, char **argv)
 				set_header(&bmp_char, 8, 16, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
 				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp_char, bits_per_pix, color_anti_flag);
+			} else if (gb2312buf[i] == '\t') {
+				i++;
+				create_blank_bmp(&bmp_char,
+						 8 * 8,
+						 1,
+						 bits_per_pix,
+						 color_anti_flag);
 			} else
 				break;
 
-			bmp_h_combin_2(&bmp_line, &bmp_char);
+			bmp_h_combin_3(&bmp_line, &bmp_char, color_anti_flag);
 			if (style.character_spacing > 0) {
 				create_blank_bmp(&bmp_blank, 
 						style.character_spacing, 
 						1, 
 						bits_per_pix, 
 						color_anti_flag);
-				debug_print();
 				bmp_h_combin_3(&bmp_line, &bmp_blank, color_anti_flag);
-				debug_print();
 			}
 		} /* for (;;) */
 		bmp_v_combin_3(&bmp_all, &bmp_line, color_anti_flag);
