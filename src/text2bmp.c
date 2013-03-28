@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 	int ret;
 
 	memset(&style, 0, sizeof(struct text_style));
-	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:o")) != -1) {
+	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:oh?")) != -1) {
 		switch (opt) {
 		case 'l': /* 左边距 */
 			style.left_margin = strtol(optarg, NULL, 0);
