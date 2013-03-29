@@ -61,6 +61,14 @@ $(ODIR)/%.o : %.c
 clean:
 	-rm -f *.o $(TARGET) obj/*
 
+sinclude $(SRC:.c=.d)
+
+%d: %c
+	@set -e; rm -f $@; \
+		$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
+		sed 's,\(.*\)\.o[:]*,$(ODIR)/\1.o $@:,' < $@.$$$$ > $@; \
+		rm -f $@.$$$$
+
 vpath %.c src
 vpath %.h src
 vpath %.o obj
