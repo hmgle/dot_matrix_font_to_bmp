@@ -199,7 +199,10 @@ int main(int argc, char **argv)
 			}
 			ptr_gb2312[0] = '\0';
 		} else if (encoding_type == GBK) {
-
+			if (fgets_gbk((char *)gb2312buf, once_read, in) == NULL)
+				break;
+			if (*gb2312buf == '\n')
+				*gb2312buf = ' ';
 		}
 
 		/*

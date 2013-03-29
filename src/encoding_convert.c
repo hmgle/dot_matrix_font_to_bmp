@@ -92,6 +92,30 @@ fgets_utf8(char *s, int n, FILE *stream)
 	return (c == EOF && cs == s) ? NULL : s;
 }
 
+char *
+fgets_gbk(char *s, int n, FILE *stream)
+{
+	int c;
+	int length;
+	char *cs = s;
+	int fix_n = 2 * n - 2;
+
+	while (fix_n > 1) {
+		c = getc(stream);
+		if (c == EOF || ((*cs++ = c) == '\n'))
+			break;
+
+		if (c < 0x80)
+			fix_n--;
+		else {
+			*cs++ = getc(stream);
+			fix_n -= 2;
+		}
+	}
+	*cs = '\0';
+	return (c == EOF && cs == s) ? NULL : s;
+}
+
 uint16_t
 unicode_to_gb2312(uint16_t unicode, const uint16_t *mem_gb2312, int gb2312_num)
 {
