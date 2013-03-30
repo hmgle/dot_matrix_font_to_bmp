@@ -147,14 +147,12 @@ create_blank_bmp(bmp_file_t *dst,
 		uint16_t bits_per_pix, 
 		int color_anti_flag)
 {
-	uint32_t rowsize;
-
 	set_header(dst, w, h, bits_per_pix);
-	rowsize = (bits_per_pix * w + 31) / 32 * 4; /* 4字节对齐 */
+
 	if (!color_anti_flag)
-		memset(dst->pdata, 0, rowsize * h);
+		memset(dst->pdata, 0, dst->dib_h.image_size);
 	else
-		memset(dst->pdata, 0xff, rowsize * h);
+		memset(dst->pdata, 0xff, dst->dib_h.image_size);
 
 	return dst;
 }
@@ -327,7 +325,8 @@ bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
 		free(bmp_blank.pdata);
 	} else if (dst->dib_h.height < add->dib_h.height) {
 		h_diff = add->dib_h.height - dst->dib_h.height;
-		rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4;
+		// rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4; /* bug: 当add->dib_h.width < dst->dib_h.width时，执行下面的create_blank_bmp()会发生内存越界 */
+		rowsize = (add->dib_h.bits_per_pix * dst->dib_h.width + 31) / 32 * 4;
 		bmp_blank.pdata = malloc(rowsize * h_diff);
 		create_blank_bmp(&bmp_blank, dst->dib_h.width, h_diff, dst->dib_h.bits_per_pix, color_anti_flag);
 		bmp_v_combin_2(&bmp_blank, dst);

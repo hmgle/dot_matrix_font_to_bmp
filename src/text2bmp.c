@@ -228,7 +228,8 @@ int main(int argc, char **argv)
 				i++;
 				create_blank_bmp(&bmp_char,
 						 8 * 8,
-						 CHAR_HEIGHT,
+						 // CHAR_HEIGHT,
+						 1,
 						 bits_per_pix,
 						 color_anti_flag);
 			} else
