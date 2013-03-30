@@ -1,16 +1,16 @@
 DEBUG =
 .PHONY: all clean
 
-CFLAGS = -Wall -O2
+CFLAGS = -Wall
 
 CROSS:=
 CC = $(CROSS)gcc
 STRIP = $(CROSS)strip
 
 ifeq ($(DEBUG), 1)
-	CFLAGS += -Wextra -DDEBUG=1
+	CFLAGS += -Wextra -DDEBUG=1 -g -O0
 else
-	CFLAGS += -DDEBUG=0
+	CFLAGS += -DDEBUG=0 -O2
 endif
 
 SRCDIR = src
@@ -21,9 +21,10 @@ OBJ  := $(patsubst %.c,$(ODIR)/%.o,$(SRC))
 
 TARGET = utf8togb2312 gb2312tobmps bmps2bmp bmpsall2bmp bmpsallv2bmp \
 	 text2bmp
-TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test test
+TMPTARGET = test_bmp_h_combin create_blank_bmp_test combin_v_3_test test \
+	combin_h_3_test test_encoding_detect
 
-all: $(TARGET) test_encoding_detect
+all: $(TARGET) $(TMPTARGET)
 
 strip_target: all
 	$(STRIP) $(TARGET)
@@ -49,6 +50,8 @@ bmpsallv2bmp: $(ODIR)/bmpsallv2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bm
 text2bmp: $(ODIR)/text2bmp.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/encoding_convert.o $(ODIR)/bmp_io.o $(ODIR)/encoding_detect.o
 
 combin_v_3_test: $(ODIR)/combin_v_3_test.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
+
+combin_h_3_test: $(ODIR)/combin_h_3_test.o $(ODIR)/dot_matrix_font_to_bmp.o $(ODIR)/bmp_io.o
 
 $(OBJ): Makefile | $(ODIR)
 

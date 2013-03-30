@@ -11,9 +11,10 @@
 #include "bmp_io.h"
 #include "debug_log.h"
 
+#define CHAR_HEIGHT	16
 #define GB2312_HZK	"gb2312.hzk"
 #define ASCII_HZK	"ASC16"
-#define FONT_BMP_SIZE	1024
+#define FONT_BMP_SIZE	(1024 * 8)
 
 struct text_style {
 	uint32_t left_margin;
@@ -48,7 +49,7 @@ int main(int argc, char **argv)
 {
 	int opt;
 	struct text_style style;
-	uint32_t bits_per_pix = 16;
+	uint32_t bits_per_pix = CHAR_HEIGHT;
 	int color_anti_flag = 0;
 	FILE *in = stdin;
 	int gb2312_num;
@@ -213,21 +214,21 @@ int main(int argc, char **argv)
 			if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
 				offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
 				i += 2;
-				set_header(&bmp_char, 16, 16, bits_per_pix);
+				set_header(&bmp_char, CHAR_HEIGHT, CHAR_HEIGHT, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp_char, bits_per_pix, color_anti_flag);
+				fontdata2bmp(addr_fd_in + offset, CHAR_HEIGHT, CHAR_HEIGHT, &bmp_char, bits_per_pix, color_anti_flag);
 
 			} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
 				offset = ascii_to_fontoffset(gb2312buf[i]);
 				i++;
-				set_header(&bmp_char, 8, 16, bits_per_pix);
+				set_header(&bmp_char, 8, CHAR_HEIGHT, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp_char, bits_per_pix, color_anti_flag);
+				fontdata2bmp(addr_ascii_fd_in + offset, 8, CHAR_HEIGHT, &bmp_char, bits_per_pix, color_anti_flag);
 			} else if (gb2312buf[i] == '\t') {
 				i++;
 				create_blank_bmp(&bmp_char,
 						 8 * 8,
-						 1,
+						 CHAR_HEIGHT,
 						 bits_per_pix,
 						 color_anti_flag);
 			} else

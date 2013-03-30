@@ -155,6 +155,7 @@ create_blank_bmp(bmp_file_t *dst,
 		memset(dst->pdata, 0, rowsize * h);
 	else
 		memset(dst->pdata, 0xff, rowsize * h);
+
 	return dst;
 }
 
