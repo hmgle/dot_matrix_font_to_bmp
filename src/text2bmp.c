@@ -14,7 +14,7 @@
 #define CHAR_HEIGHT	16
 #define GB2312_HZK	"gb2312.hzk"
 #define ASCII_HZK	"ASC16"
-#define FONT_BMP_SIZE	(1024 * 8)
+#define FONT_BMP_SIZE	1024
 
 struct text_style {
 	uint32_t left_margin;
@@ -228,7 +228,6 @@ int main(int argc, char **argv)
 				i++;
 				create_blank_bmp(&bmp_char,
 						 8 * 8,
-						 // CHAR_HEIGHT,
 						 1,
 						 bits_per_pix,
 						 color_anti_flag);
