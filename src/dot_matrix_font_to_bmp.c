@@ -62,8 +62,6 @@ conv_row(const uint8_t *ptrfontdata,
 		bit = color_anti_flag ? !bit : bit;
 		if (bit) {
 			switch (bits_per_pix) {
-			case 1:
-				break;
 			case 16:
 				memset(ptmp, 0xff, 2);
 				ptmp += 2;
@@ -72,13 +70,17 @@ conv_row(const uint8_t *ptrfontdata,
 				memset(ptmp, 0xff, 3);
 				ptmp += 3;
 				break;
+			case 1:
+				break;
+			case 8:
+				memset(ptmp, 0xff, 1);
+				ptmp++;
+				break;
 			default:
 				break;
 			}
 		} else {
 			switch (bits_per_pix) {
-			case 1:
-				break;
 			case 16:
 				memset(ptmp, 0x0, 2);
 				ptmp += 2;
@@ -86,6 +88,12 @@ conv_row(const uint8_t *ptrfontdata,
 			case 24:
 				memset(ptmp, 0x0, 3);
 				ptmp += 3;
+				break;
+			case 1:
+				break;
+			case 8:
+				memset(ptmp, 0x0, 1);
+				ptmp++;
 				break;
 			default:
 				break;

@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 {
 	int opt;
 	struct text_style style;
-	uint32_t bits_per_pix = CHAR_HEIGHT;
+	uint32_t bits_per_pix = 16;
 	int color_anti_flag = 0;
 	FILE *in = stdin;
 	int gb2312_num;

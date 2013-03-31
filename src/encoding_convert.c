@@ -95,8 +95,7 @@ fgets_utf8(char *s, int n, FILE *stream)
 char *
 fgets_gbk(char *s, int n, FILE *stream)
 {
-	int c;
-	int length;
+	int c = EOF;
 	char *cs = s;
 	int fix_n = 2 * n - 2;
 
