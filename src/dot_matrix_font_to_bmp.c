@@ -72,10 +72,6 @@ conv_row(const uint8_t *ptrfontdata,
 				break;
 			case 1:
 				break;
-			case 8:
-				memset(ptmp, 0xff, 1);
-				ptmp++;
-				break;
 			default:
 				break;
 			}
@@ -90,10 +86,6 @@ conv_row(const uint8_t *ptrfontdata,
 				ptmp += 3;
 				break;
 			case 1:
-				break;
-			case 8:
-				memset(ptmp, 0x0, 1);
-				ptmp++;
 				break;
 			default:
 				break;
