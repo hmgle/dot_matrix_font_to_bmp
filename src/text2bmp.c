@@ -30,19 +30,19 @@ static void show_usage(const char *pro_name);
 
 static void show_usage(const char *pro_name)
 {
-	fprintf(stderr, "Usage: %s [Options] [inputfile]\n", pro_name);
-	fprintf(stderr, "\n");
-	fprintf(stderr, "Options:\n");
-	fprintf(stderr, "        -l val        set left margin\n");
-	fprintf(stderr, "        -r val        set right margin\n");
-	fprintf(stderr, "        -u val        set top margin\n");
-	fprintf(stderr, "        -d val        set bottom margin\n");
-	fprintf(stderr, "        -i val        set line spacing\n");
-	fprintf(stderr, "        -c val        set character spacing\n");
-	fprintf(stderr, "        -m val        set max line length\n");
-	fprintf(stderr, "        -b val        set bits_per_pix\n");
-	fprintf(stderr, "        -o            anti_color\n");
-	fprintf(stderr, "\n");
+	fprintf(stderr, "Usage: %s [Options] [inputfile]\n"
+			"\n"
+			"Options:\n"
+			"        -l val        set left margin\n"
+			"        -r val        set right margin\n"
+			"        -u val        set top margin\n"
+			"        -d val        set bottom margin\n"
+			"        -i val        set line spacing\n"
+			"        -c val        set character spacing\n"
+			"        -m val        set max line length\n"
+			"        -b val        set bits_per_pix\n"
+			"        -o            anti_color\n"
+			"\n", pro_name);
 }
 
 int main(int argc, char **argv)
