@@ -66,7 +66,7 @@ clean:
 
 sinclude $(SRC:.c=.d)
 
-%d: %c
+%.d: %.c
 	@set -e; rm -f $@; \
 		$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
 		sed 's,\(.*\)\.o[:]*,$(ODIR)/\1.o $@:,' < $@.$$$$ > $@; \
