@@ -151,7 +151,7 @@ create_blank_bmp(bmp_file_t *dst,
 		uint32_t color)
 {
 	set_header(dst, w, h, bits_per_pix);
-	int i;
+	uint32_t i;
 
 	switch (bits_per_pix) {
 	case 16:
