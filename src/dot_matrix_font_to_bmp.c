@@ -46,7 +46,7 @@ conv_row(const uint8_t *ptrfontdata,
 	 uint32_t width, 
 	 uint8_t *pdest,
 	 uint16_t bits_per_pix,
-	 int color_anti_flag)
+	 color_setting_t *pcolor)
 {
 	uint32_t i;
 	int char_num;
@@ -59,15 +59,16 @@ conv_row(const uint8_t *ptrfontdata,
 		char_num = i / 8;
 		char_bit = 7 - i % 8;
 		bit = ptrfontdata[char_num] & (1 << char_bit);
-		bit = color_anti_flag ? !bit : bit;
 		if (bit) {
 			switch (bits_per_pix) {
 			case 16:
-				memset(ptmp, 0xff, 2);
+				// memset(ptmp, 0xff, 2);
+				memcpy(ptmp, &pcolor->fg_color, 2);
 				ptmp += 2;
 				break;
 			case 24:
-				memset(ptmp, 0xff, 3);
+				// memset(ptmp, 0xff, 3);
+				memcpy(ptmp, &pcolor->fg_color, 3);
 				ptmp += 3;
 				break;
 			case 1:
@@ -78,11 +79,13 @@ conv_row(const uint8_t *ptrfontdata,
 		} else {
 			switch (bits_per_pix) {
 			case 16:
-				memset(ptmp, 0x0, 2);
+				// memset(ptmp, 0x0, 2);
+				memcpy(ptmp, &pcolor->bg_color, 2);
 				ptmp += 2;
 				break;
 			case 24:
-				memset(ptmp, 0x0, 3);
+				// memset(ptmp, 0x0, 3);
+				memcpy(ptmp, &pcolor->bg_color, 3);
 				ptmp += 3;
 				break;
 			case 1:
@@ -100,7 +103,7 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 	     uint32_t height, 
 	     bmp_file_t *ptrbmp, 
 	     uint16_t bits_per_pix,
-	     int color_anti_flag)
+	     color_setting_t *pcolor)
 {
 	uint32_t rowsize;
 	uint8_t *ptrbmpdata;
@@ -119,7 +122,7 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 			 width, 
 			 ptrbmpdata,
 			 bits_per_pix,
-			 color_anti_flag);
+			 pcolor);
 		ptrbmpdata += rowsize;
 	}
 }
@@ -145,15 +148,23 @@ bmp_file_t *
 create_blank_bmp(bmp_file_t *dst, 
 		uint32_t w, uint32_t h, 
 		uint16_t bits_per_pix, 
-		int color_anti_flag)
+		uint32_t color)
 {
 	set_header(dst, w, h, bits_per_pix);
+	int i;
 
-	if (!color_anti_flag)
-		memset(dst->pdata, 0, dst->dib_h.image_size);
-	else
-		memset(dst->pdata, 0xff, dst->dib_h.image_size);
-
+	switch (bits_per_pix) {
+	case 16:
+		for (i = 0; i < dst->dib_h.image_size; i += 2)
+			memcpy(dst->pdata + i, &color, 2);
+		break;
+	case 24:
+		for (i = 0; i < dst->dib_h.image_size; i += 3)
+			memcpy(dst->pdata + i, &color, 3);
+		break;
+	default:
+		break;
+	}
 	return dst;
 }
 
@@ -294,7 +305,7 @@ bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add)
  * 垂直分辨率较小的位图上边将补齐空白
  */
 bmp_file_t *
-bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
+bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color)
 {
 	uint32_t h_diff;
 	uint32_t rowsize;
@@ -314,7 +325,7 @@ bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
 		h_diff = dst->dib_h.height - add->dib_h.height;
 		rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4;
 		bmp_blank.pdata = malloc(rowsize * h_diff);
-		create_blank_bmp(&bmp_blank, add->dib_h.width, h_diff, dst->dib_h.bits_per_pix, color_anti_flag);
+		create_blank_bmp(&bmp_blank, add->dib_h.width, h_diff, dst->dib_h.bits_per_pix, blank_color);
 		memcpy(&tmp_bmp, &bmp_blank, sizeof(tmp_bmp));
 		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
 		memcpy(tmp_bmp.pdata, bmp_blank.pdata, tmp_bmp.dib_h.image_size);
@@ -328,7 +339,7 @@ bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
 		// rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4; /* bug: 当add->dib_h.width < dst->dib_h.width时，执行下面的create_blank_bmp()会发生内存越界 */
 		rowsize = (add->dib_h.bits_per_pix * dst->dib_h.width + 31) / 32 * 4;
 		bmp_blank.pdata = malloc(rowsize * h_diff);
-		create_blank_bmp(&bmp_blank, dst->dib_h.width, h_diff, dst->dib_h.bits_per_pix, color_anti_flag);
+		create_blank_bmp(&bmp_blank, dst->dib_h.width, h_diff, dst->dib_h.bits_per_pix, blank_color);
 		bmp_v_combin_2(&bmp_blank, dst);
 		bmp_h_combin_2(&bmp_blank, add);
 		memcpy(&dst->bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
@@ -372,7 +383,7 @@ bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add)
  * 水平分辨率较小的位图左边将补齐空白
  */
 bmp_file_t *
-bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
+bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color)
 {
 	bmp_file_t tmp_bmp;
 	bmp_file_t blank_bmp;
@@ -393,7 +404,7 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
 
 		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
 		blank_bmp.pdata = malloc(rowsize * add->dib_h.height);
-		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix, color_anti_flag);
+		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix, blank_color);
 		memcpy(&tmp_bmp, add, sizeof(tmp_bmp));
 		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
 		memcpy(tmp_bmp.pdata, add->pdata, tmp_bmp.dib_h.image_size);
@@ -406,7 +417,7 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag)
 		w_diff = add->dib_h.width - dst->dib_h.width;
 		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
 		blank_bmp.pdata = malloc(rowsize * dst->dib_h.height);
-		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix, color_anti_flag);
+		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix, blank_color);
 		bmp_h_combin_2(dst, &blank_bmp);
 		bmp_v_combin_2(dst, add);
 

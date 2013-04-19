@@ -38,18 +38,23 @@ typedef struct bmp_size {
 	uint32_t height;
 } bmp_size_t;
 
+typedef struct color_setting {
+	uint32_t bg_color;
+	uint32_t fg_color;
+} color_setting_t;
+
 void set_header(bmp_file_t *pbmp_f, uint32_t width, uint32_t height, uint16_t bits_per_pix);
 void get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_header_t *dib_header);
-void conv_row(const uint8_t *ptrfontdata, uint32_t width, uint8_t *pdest, uint16_t bits_per_pix, int color_anti_flag);
-void fontdata2bmp(const uint8_t *ptrfontdata, uint32_t width, uint32_t hegiht, bmp_file_t *ptrbmp, uint16_t bits_per_pix, int color_anti_flag);
+void conv_row(const uint8_t *ptrfontdata, uint32_t width, uint8_t *pdest, uint16_t bits_per_pix, color_setting_t *pcolor);
+void fontdata2bmp(const uint8_t *ptrfontdata, uint32_t width, uint32_t hegiht, bmp_file_t *ptrbmp, uint16_t bits_per_pix, color_setting_t *pcolor);
 uint32_t gb2312code_to_fontoffset(uint32_t gb2312code);
 uint32_t ascii_to_fontoffset(uint32_t ascii);
 
-bmp_file_t *create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix, int color_anti_flag);
+bmp_file_t *create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix, uint32_t color);
 bmp_file_t *bmp_h_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
 bmp_file_t *bmp_v_combin(const bmp_file_t *src1, const bmp_file_t *src2, bmp_file_t *dst);
 bmp_file_t *bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add);
-bmp_file_t *bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag);
+bmp_file_t *bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color);
 bmp_file_t *bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add);
-bmp_file_t *bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, int color_anti_flag); /* 支持水平分辨率不同位图 */
+bmp_file_t *bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color); /* 支持水平分辨率不同位图 */
 #endif

@@ -30,16 +30,19 @@ int main(int argc, char **argv)
 	bmp_file_t bmp;
 	int ret;
 	char *pret;
-	int color_anti_flag = 0;
+	color_setting_t color = {0x0, 0xffffffff};
 	int i;
 
-	while ((opt = getopt(argc, argv, "d:c")) != -1) {
+	while ((opt = getopt(argc, argv, "d:b:f:")) != -1) {
 		switch (opt) {
 		case 'd':
 			bits_per_pix = atoi(optarg);
 			break;
-		case 'c':
-			color_anti_flag = 1;
+		case 'b':
+			color.bg_color = strtol(optarg, NULL, 0);
+			break;
+		case 'f':
+			color.fg_color = strtol(optarg, NULL, 0);
 			break;
 		default: /* '?' */
 			fprintf(stderr, 
@@ -94,11 +97,11 @@ int main(int argc, char **argv)
 		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
 			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
 			i += 2;
-			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, color_anti_flag);
+			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, &color);
 		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) { /* ascii */
 			offset = ascii_to_fontoffset(gb2312buf[i]);
 			i++;
-			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp, bits_per_pix, color_anti_flag);
+			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp, bits_per_pix, &color);
 		} else
 			break;
 

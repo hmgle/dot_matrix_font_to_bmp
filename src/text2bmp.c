@@ -41,7 +41,8 @@ static void show_usage(const char *pro_name)
 			"        -c val        set character spacing\n"
 			"        -m val        set max line length\n"
 			"        -b val        set bits_per_pix\n"
-			"        -o            anti_color\n"
+			"        -f val        set foreground color\n"
+			"        -g val        set background color\n"
 			"\n", pro_name);
 }
 
@@ -50,7 +51,8 @@ int main(int argc, char **argv)
 	int opt;
 	struct text_style style;
 	uint32_t bits_per_pix = 16;
-	int color_anti_flag = 0;
+	// int color_anti_flag = 0;
+	color_setting_t color = {0x0, 0xffffffff};
 	FILE *in = stdin;
 	int gb2312_num;
 	uint16_t *mem_addr;
@@ -77,7 +79,7 @@ int main(int argc, char **argv)
 	int ret;
 
 	memset(&style, 0, sizeof(struct text_style));
-	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:oh?")) != -1) {
+	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:f:g:h?")) != -1) {
 		switch (opt) {
 		case 'l': /* 左边距 */
 			style.left_margin = strtol(optarg, NULL, 0);
@@ -103,8 +105,11 @@ int main(int argc, char **argv)
 		case 'b': /* 位深 */
 			bits_per_pix = strtol(optarg, NULL, 0);
 			break;
-		case 'o': /* 白底黑字 */
-			color_anti_flag = 1;
+		case 'f': /* 前景色 */
+			color.fg_color = strtol(optarg, NULL, 0);
+			break;
+		case 'g': /* 背景色 */
+			color.bg_color = strtol(optarg, NULL, 0);
 			break;
 		default:
 			show_usage(argv[0]);
@@ -216,42 +221,42 @@ int main(int argc, char **argv)
 				i += 2;
 				set_header(&bmp_char, CHAR_HEIGHT, CHAR_HEIGHT, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_fd_in + offset, CHAR_HEIGHT, CHAR_HEIGHT, &bmp_char, bits_per_pix, color_anti_flag);
+				fontdata2bmp(addr_fd_in + offset, CHAR_HEIGHT, CHAR_HEIGHT, &bmp_char, bits_per_pix, &color);
 
 			} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
 				offset = ascii_to_fontoffset(gb2312buf[i]);
 				i++;
 				set_header(&bmp_char, 8, CHAR_HEIGHT, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_ascii_fd_in + offset, 8, CHAR_HEIGHT, &bmp_char, bits_per_pix, color_anti_flag);
+				fontdata2bmp(addr_ascii_fd_in + offset, 8, CHAR_HEIGHT, &bmp_char, bits_per_pix, &color);
 			} else if (gb2312buf[i] == '\t') {
 				i++;
 				create_blank_bmp(&bmp_char,
 						 8 * 8,
 						 1,
 						 bits_per_pix,
-						 color_anti_flag);
+						 color.bg_color);
 			} else
 				break;
 
-			bmp_h_combin_3(&bmp_line, &bmp_char, color_anti_flag);
+			bmp_h_combin_3(&bmp_line, &bmp_char, color.bg_color);
 			if (style.character_spacing > 0) {
 				create_blank_bmp(&bmp_blank, 
 						style.character_spacing, 
 						1, 
 						bits_per_pix, 
-						color_anti_flag);
-				bmp_h_combin_3(&bmp_line, &bmp_blank, color_anti_flag);
+						color.bg_color);
+				bmp_h_combin_3(&bmp_line, &bmp_blank, color.bg_color);
 			}
 		} /* for (;;) */
-		bmp_v_combin_3(&bmp_all, &bmp_line, color_anti_flag);
+		bmp_v_combin_3(&bmp_all, &bmp_line, color.bg_color);
 		if (style.line_spacing > 0) {
 			create_blank_bmp(&bmp_blank, 
 					1, 
 					style.line_spacing, 
 					bits_per_pix, 
-					color_anti_flag);
-			bmp_v_combin_3(&bmp_all, &bmp_blank, color_anti_flag);
+					color.bg_color);
+			bmp_v_combin_3(&bmp_all, &bmp_blank, color.bg_color);
 		}
 		if (bmp_line.pdata) {
 			free(bmp_line.pdata);
@@ -268,8 +273,8 @@ int main(int argc, char **argv)
 				style.left_margin, 
 				1, 
 				bits_per_pix, 
-				color_anti_flag);
-		bmp_h_combin_3(&bmp_blank, &bmp_all, color_anti_flag);
+				color.bg_color);
+		bmp_h_combin_3(&bmp_blank, &bmp_all, color.bg_color);
 		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
 		memcpy(&bmp_all.dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
 		bmp_all.pdata = realloc(bmp_all.pdata, bmp_all.dib_h.image_size);
@@ -280,16 +285,16 @@ int main(int argc, char **argv)
 				style.right_margin, 
 				1, 
 				bits_per_pix, 
-				color_anti_flag);
-		bmp_h_combin_3(&bmp_all, &bmp_blank, color_anti_flag);
+				color.bg_color);
+		bmp_h_combin_3(&bmp_all, &bmp_blank, color.bg_color);
 	}
 	if (style.up_margin > 0) {
 		create_blank_bmp(&bmp_blank, 
 				1, 
 				style.up_margin, 
 				bits_per_pix, 
-				color_anti_flag);
-		bmp_v_combin_3(&bmp_blank, &bmp_all, color_anti_flag);
+				color.bg_color);
+		bmp_v_combin_3(&bmp_blank, &bmp_all, color.bg_color);
 		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
 		memcpy(&bmp_all.dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
 		bmp_all.pdata = realloc(bmp_all.pdata, bmp_all.dib_h.image_size);
@@ -300,8 +305,8 @@ int main(int argc, char **argv)
 				1, 
 				style.down_margin, 
 				bits_per_pix, 
-				color_anti_flag);
-		bmp_v_combin_3(&bmp_all, &bmp_blank, color_anti_flag);
+				color.bg_color);
+		bmp_v_combin_3(&bmp_all, &bmp_blank, color.bg_color);
 	}
 
 	/*
