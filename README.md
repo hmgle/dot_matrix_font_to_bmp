@@ -64,7 +64,7 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
         卡尔.萨根 魔鬼出没的世界
 
-    ./text2bmp -o -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
+    ./text2bmp -g 0xffff -f 0x0 -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
 
 
 生成的位图：

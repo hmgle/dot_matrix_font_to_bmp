@@ -41,8 +41,8 @@ static void show_usage(const char *pro_name)
 			"        -c val        set character spacing\n"
 			"        -m val        set max line length\n"
 			"        -b val        set bits_per_pix\n"
-			"        -f val        set foreground color\n"
 			"        -g val        set background color\n"
+			"        -f val        set foreground color\n"
 			"\n", pro_name);
 }
 
@@ -51,7 +51,6 @@ int main(int argc, char **argv)
 	int opt;
 	struct text_style style;
 	uint32_t bits_per_pix = 16;
-	// int color_anti_flag = 0;
 	color_setting_t color = {0x0, 0xffffffff};
 	FILE *in = stdin;
 	int gb2312_num;
@@ -105,11 +104,11 @@ int main(int argc, char **argv)
 		case 'b': /* 位深 */
 			bits_per_pix = strtol(optarg, NULL, 0);
 			break;
-		case 'f': /* 前景色 */
-			color.fg_color = strtol(optarg, NULL, 0);
-			break;
 		case 'g': /* 背景色 */
 			color.bg_color = strtol(optarg, NULL, 0);
+			break;
+		case 'f': /* 前景色 */
+			color.fg_color = strtol(optarg, NULL, 0);
 			break;
 		default:
 			show_usage(argv[0]);
