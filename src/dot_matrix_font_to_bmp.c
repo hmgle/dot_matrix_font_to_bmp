@@ -62,12 +62,10 @@ conv_row(const uint8_t *ptrfontdata,
 		if (bit) {
 			switch (bits_per_pix) {
 			case 16:
-				// memset(ptmp, 0xff, 2);
 				memcpy(ptmp, &pcolor->fg_color, 2);
 				ptmp += 2;
 				break;
 			case 24:
-				// memset(ptmp, 0xff, 3);
 				memcpy(ptmp, &pcolor->fg_color, 3);
 				ptmp += 3;
 				break;
@@ -79,12 +77,10 @@ conv_row(const uint8_t *ptrfontdata,
 		} else {
 			switch (bits_per_pix) {
 			case 16:
-				// memset(ptmp, 0x0, 2);
 				memcpy(ptmp, &pcolor->bg_color, 2);
 				ptmp += 2;
 				break;
 			case 24:
-				// memset(ptmp, 0x0, 3);
 				memcpy(ptmp, &pcolor->bg_color, 3);
 				ptmp += 3;
 				break;
