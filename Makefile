@@ -10,7 +10,12 @@ STRIP = $(CROSS)strip
 ifeq ($(DEBUG), 1)
 	CFLAGS += -Wextra -DDEBUG=1 -g -O0
 else
-	CFLAGS += -DDEBUG=0 -O2
+	ifeq ($(DEBUG), 2) # for gprof
+		CFLAGS += -Wextra -DDEBUG=1 -O0 -g -pg
+		LDFLAGS += -pg -static
+	else
+		CFLAGS += -DDEBUG=0 -O2
+	endif
 endif
 
 SRCDIR = src
