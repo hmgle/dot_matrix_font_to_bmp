@@ -1,6 +1,7 @@
 *.o
 *.d
 *.bmp
+*.png
 *.bak
 *.tmp
 !test1.bmp
@@ -18,3 +19,4 @@ test_bmp_h_combin
 text2bmp
 combin_v_3_test
 create_blank_bmp_test
+tags

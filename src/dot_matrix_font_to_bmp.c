@@ -2,6 +2,8 @@
 #include "debug_log.h"
 #include "dot_matrix_font_to_bmp.h"
 
+static void conv_row(const uint8_t *ptrfontdata, uint32_t width, uint8_t *pdest, uint16_t bits_per_pix, color_setting_t *pcolor);
+
 void 
 set_header(bmp_file_t *pbmp_f, 
 	   uint32_t width, 
@@ -41,7 +43,7 @@ get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_header_t
 	dib_header->dib_header_size = pbmp_f->dib_h.dib_header_size;
 }
 
-void 
+static void 
 conv_row(const uint8_t *ptrfontdata, 
 	 uint32_t width, 
 	 uint8_t *pdest,
