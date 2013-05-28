@@ -77,8 +77,7 @@ detect_file_encoding(FILE *text_fp)
 	if (len >= 3 && buf[0] == 0xef && buf[1] == 0xbb && buf[2] == 0xbf) {
 		encoding_type = UTF8_WITH_BOM;
 		goto end;
-	}
-	else {
+	} else {
 		ret = is_utf8(buf, len);
 		if (ret > 0) {
 			encoding_type = GBK;
