@@ -5,13 +5,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <linux/limits.h>
 #include "dot_matrix_font_to_bmp.h"
 #include "encoding_convert.h"
 #include "encoding_detect.h"
 #include "bmp_io.h"
 #include "debug_log.h"
 
-#define GB2312_HZK	"gb2312.hzk"
 #define ASCII_HZK	"ASC16"
 #define FONT_BMP_SIZE	4096
 
@@ -32,6 +32,7 @@ static void show_usage(const char *pro_name)
 	fprintf(stderr, "Usage: %s [Options] [inputfile]\n"
 			"\n"
 			"Options:\n"
+			"        -F font_file  set font file\n"
 			"        -H val        font height\n"
 			"        -l val        set left margin\n"
 			"        -r val        set right margin\n"
@@ -49,6 +50,7 @@ static void show_usage(const char *pro_name)
 int main(int argc, char **argv)
 {
 	int opt;
+	char gb2312_hzk[PATH_MAX] = "gb2312.hzk";
 	struct text_style style;
 	uint32_t font_height = 16;
 	uint32_t bits_per_pix = 16;
@@ -79,8 +81,11 @@ int main(int argc, char **argv)
 	int ret;
 
 	memset(&style, 0, sizeof(struct text_style));
-	while ((opt = getopt(argc, argv, "H:l:r:u:d:i:c:m:b:f:g:h?")) != -1) {
+	while ((opt = getopt(argc, argv, "F:H:l:r:u:d:i:c:m:b:f:g:h?")) != -1) {
 		switch (opt) {
+		case 'F': /* 字库文件 */
+			strncpy(gb2312_hzk, optarg, PATH_MAX);
+			break;
 		case 'H': /* 字库的字体高度 */
 			font_height = strtol(optarg, NULL, 0);
 			break;
@@ -132,7 +137,7 @@ int main(int argc, char **argv)
 
 	mem_addr = mem_gb2312("./GB2312", &gb2312_num);
 
-	font_fd = open(GB2312_HZK, O_RDONLY);
+	font_fd = open(gb2312_hzk, O_RDONLY);
 	if (font_fd < 0) {
 		perror("open");
 		exit(1);
