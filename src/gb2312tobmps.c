@@ -14,6 +14,7 @@
 
 #define GB2312_HZK	"gb2312.hzk"
 #define ASCII_HZK	"ASC16"
+#define FONTHEIGHT	16
 
 int main(int argc, char **argv)
 {
@@ -95,7 +96,7 @@ int main(int argc, char **argv)
 	memset(bmp.pdata, 0, bmp.dib_h.image_size);
 	for (;;) {
 		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
-			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
+			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1], FONTHEIGHT);
 			i += 2;
 			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, &color);
 		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) { /* ascii */

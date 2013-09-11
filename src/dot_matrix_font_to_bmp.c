@@ -126,13 +126,13 @@ fontdata2bmp(const uint8_t *ptrfontdata,
 }
 
 uint32_t 
-gb2312code_to_fontoffset(uint32_t gb2312code)
+gb2312code_to_fontoffset(uint32_t gb2312code, uint32_t font_height)
 {
 	uint32_t fontoffset;
 
 	fontoffset = (gb2312code % 0x100 - 0xA1) * 94
 		     + (gb2312code / 0x100 - 0xA1);
-	fontoffset *= 32; /* for HZK16 */
+	fontoffset *= (font_height * font_height / 8);
 	return fontoffset;
 }
 

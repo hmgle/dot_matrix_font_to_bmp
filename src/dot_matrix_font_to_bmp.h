@@ -41,7 +41,7 @@ typedef struct color_setting {
 void set_header(bmp_file_t *pbmp_f, uint32_t width, uint32_t height, uint16_t bits_per_pix);
 void get_header(const bmp_file_t *pbmp_f, bmp_file_header_t *bmp_header, dib_header_t *dib_header);
 void fontdata2bmp(const uint8_t *ptrfontdata, uint32_t width, uint32_t hegiht, bmp_file_t *ptrbmp, uint16_t bits_per_pix, color_setting_t *pcolor);
-uint32_t gb2312code_to_fontoffset(uint32_t gb2312code);
+uint32_t gb2312code_to_fontoffset(uint32_t gb2312code, uint32_t font_height);
 uint32_t ascii_to_fontoffset(uint32_t ascii);
 
 bmp_file_t *create_blank_bmp(bmp_file_t *dst, uint32_t w, uint32_t h, uint16_t bits_per_pix, uint32_t color);

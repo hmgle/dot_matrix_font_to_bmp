@@ -11,10 +11,9 @@
 #include "bmp_io.h"
 #include "debug_log.h"
 
-#define CHAR_HEIGHT	16
 #define GB2312_HZK	"gb2312.hzk"
 #define ASCII_HZK	"ASC16"
-#define FONT_BMP_SIZE	1024
+#define FONT_BMP_SIZE	4096
 
 struct text_style {
 	uint32_t left_margin;
@@ -33,6 +32,7 @@ static void show_usage(const char *pro_name)
 	fprintf(stderr, "Usage: %s [Options] [inputfile]\n"
 			"\n"
 			"Options:\n"
+			"        -H val        font height\n"
 			"        -l val        set left margin\n"
 			"        -r val        set right margin\n"
 			"        -u val        set top margin\n"
@@ -50,6 +50,7 @@ int main(int argc, char **argv)
 {
 	int opt;
 	struct text_style style;
+	uint32_t font_height = 16;
 	uint32_t bits_per_pix = 16;
 	color_setting_t color = {0x0, 0xffffffff};
 	FILE *in = stdin;
@@ -78,8 +79,11 @@ int main(int argc, char **argv)
 	int ret;
 
 	memset(&style, 0, sizeof(struct text_style));
-	while ((opt = getopt(argc, argv, "l:r:u:d:i:c:m:b:f:g:h?")) != -1) {
+	while ((opt = getopt(argc, argv, "H:l:r:u:d:i:c:m:b:f:g:h?")) != -1) {
 		switch (opt) {
+		case 'H': /* 字库的字体高度 */
+			font_height = strtol(optarg, NULL, 0);
+			break;
 		case 'l': /* 左边距 */
 			style.left_margin = strtol(optarg, NULL, 0);
 			break;
@@ -216,18 +220,18 @@ int main(int argc, char **argv)
 		i = 0;
 		for (;;) {
 			if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
-				offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1]);
+				offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1], font_height);
 				i += 2;
-				set_header(&bmp_char, CHAR_HEIGHT, CHAR_HEIGHT, bits_per_pix);
+				set_header(&bmp_char, font_height, font_height, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_fd_in + offset, CHAR_HEIGHT, CHAR_HEIGHT, &bmp_char, bits_per_pix, &color);
+				fontdata2bmp(addr_fd_in + offset, font_height, font_height, &bmp_char, bits_per_pix, &color);
 
 			} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
 				offset = ascii_to_fontoffset(gb2312buf[i]);
 				i++;
-				set_header(&bmp_char, 8, CHAR_HEIGHT, bits_per_pix);
+				set_header(&bmp_char, 8, 16, bits_per_pix);
 				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_ascii_fd_in + offset, 8, CHAR_HEIGHT, &bmp_char, bits_per_pix, &color);
+				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp_char, bits_per_pix, &color);
 			} else if (gb2312buf[i] == '\t') {
 				i++;
 				create_blank_bmp(&bmp_char,
