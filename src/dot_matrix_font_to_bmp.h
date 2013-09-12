@@ -51,4 +51,8 @@ bmp_file_t *bmp_h_combin_2(bmp_file_t *dst, const bmp_file_t *add);
 bmp_file_t *bmp_h_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color);
 bmp_file_t *bmp_v_combin_2(bmp_file_t *dst, const bmp_file_t *add);
 bmp_file_t *bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color); /* 支持水平分辨率不同位图 */
+bmp_file_t *bmp_h_combin_rl_2(bmp_file_t *dst, const bmp_file_t *add);
+bmp_file_t *bmp_h_combin_rl_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color);
+bmp_file_t *bmp_v_combin_du_2(bmp_file_t *dst, const bmp_file_t *add);
+bmp_file_t *bmp_v_combin_du_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color); /* 支持水平分辨率不同位图 */
 #endif

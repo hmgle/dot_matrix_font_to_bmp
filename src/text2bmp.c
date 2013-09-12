@@ -34,6 +34,7 @@ static void show_usage(const char *pro_name)
 			"Options:\n"
 			"        -F font_file  set font file\n"
 			"        -H val        font height\n"
+			"        -e            vertical\n"
 			"        -l val        set left margin\n"
 			"        -r val        set right margin\n"
 			"        -u val        set top margin\n"
@@ -52,6 +53,7 @@ int main(int argc, char **argv)
 	int opt;
 	char gb2312_hzk[PATH_MAX] = "gb2312.hzk";
 	struct text_style style;
+	int vertical_flag = 0;
 	uint32_t font_height = 16;
 	uint32_t bits_per_pix = 16;
 	color_setting_t color = {0x0, 0xffffffff};
@@ -81,13 +83,16 @@ int main(int argc, char **argv)
 	int ret;
 
 	memset(&style, 0, sizeof(struct text_style));
-	while ((opt = getopt(argc, argv, "F:H:l:r:u:d:i:c:m:b:f:g:h?")) != -1) {
+	while ((opt = getopt(argc, argv, "F:H:el:r:u:d:i:c:m:b:f:g:h?")) != -1) {
 		switch (opt) {
 		case 'F': /* 字库文件 */
 			strncpy(gb2312_hzk, optarg, PATH_MAX);
 			break;
 		case 'H': /* 字库的字体高度 */
 			font_height = strtol(optarg, NULL, 0);
+			break;
+		case 'e': /* 竖向排版 */
+			vertical_flag = 1;
 			break;
 		case 'l': /* 左边距 */
 			style.left_margin = strtol(optarg, NULL, 0);
@@ -247,17 +252,26 @@ int main(int argc, char **argv)
 			} else
 				break;
 
-			bmp_h_combin_3(&bmp_line, &bmp_char, color.bg_color);
+			if (vertical_flag == 0)
+				bmp_h_combin_3(&bmp_line, &bmp_char, color.bg_color);
+			else
+				bmp_v_combin_3(&bmp_line, &bmp_char, color.bg_color);
 			if (style.character_spacing > 0) {
 				create_blank_bmp(&bmp_blank, 
 						style.character_spacing, 
 						1, 
 						bits_per_pix, 
 						color.bg_color);
-				bmp_h_combin_3(&bmp_line, &bmp_blank, color.bg_color);
+				if (vertical_flag == 0)
+					bmp_h_combin_3(&bmp_line, &bmp_blank, color.bg_color);
+				else
+					bmp_v_combin_3(&bmp_line, &bmp_blank, color.bg_color);
 			}
 		} /* for (;;) */
-		bmp_v_combin_3(&bmp_all, &bmp_line, color.bg_color);
+		if (vertical_flag == 0)
+			bmp_v_combin_3(&bmp_all, &bmp_line, color.bg_color);
+		else
+			bmp_h_combin_rl_3(&bmp_all, &bmp_line, color.bg_color);
 		if (style.line_spacing > 0) {
 			create_blank_bmp(&bmp_blank, 
 					1, 

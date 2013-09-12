@@ -425,3 +425,152 @@ bmp_v_combin_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color)
 
 	return dst;
 }
+
+bmp_file_t *
+bmp_h_combin_rl_2(bmp_file_t *dst, const bmp_file_t *add)
+{
+	bmp_file_t tmp;
+
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+	} else {
+		memcpy(&tmp, dst, sizeof(bmp_file_t));
+		tmp.pdata = malloc(tmp.dib_h.image_size);
+		memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
+		dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
+		bmp_h_combin(add, &tmp, dst);
+
+		free(tmp.pdata);
+	}
+	return dst;
+}
+
+/* 
+ * 水平合并支持垂直分辨率不同位图
+ * 垂直分辨率较小的位图上边将补齐空白
+ */
+bmp_file_t *
+bmp_h_combin_rl_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color)
+{
+	uint32_t h_diff;
+	uint32_t rowsize;
+	bmp_file_t bmp_blank;
+	bmp_file_t tmp_bmp;
+
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+		return dst;
+	} 
+	/*
+	 * else 
+	 */
+	if (dst->dib_h.height > add->dib_h.height) {
+		h_diff = dst->dib_h.height - add->dib_h.height;
+		rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4;
+		bmp_blank.pdata = malloc(rowsize * h_diff);
+		create_blank_bmp(&bmp_blank, add->dib_h.width, h_diff, dst->dib_h.bits_per_pix, blank_color);
+		memcpy(&tmp_bmp, &bmp_blank, sizeof(tmp_bmp));
+		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
+		memcpy(tmp_bmp.pdata, bmp_blank.pdata, tmp_bmp.dib_h.image_size);
+		bmp_v_combin_2(&tmp_bmp, add);
+		bmp_h_combin_rl_2(dst, &tmp_bmp);
+
+		free(tmp_bmp.pdata);
+		free(bmp_blank.pdata);
+	} else if (dst->dib_h.height < add->dib_h.height) {
+		h_diff = add->dib_h.height - dst->dib_h.height;
+		// rowsize = (add->dib_h.bits_per_pix * add->dib_h.width + 31) / 32 * 4; /* bug: 当add->dib_h.width < dst->dib_h.width时，执行下面的create_blank_bmp()会发生内存越界 */
+		rowsize = (add->dib_h.bits_per_pix * dst->dib_h.width + 31) / 32 * 4;
+		bmp_blank.pdata = malloc(rowsize * h_diff);
+		create_blank_bmp(&bmp_blank, dst->dib_h.width, h_diff, dst->dib_h.bits_per_pix, blank_color);
+		bmp_v_combin_2(&bmp_blank, dst);
+		bmp_h_combin_rl_2(&bmp_blank, add);
+		memcpy(&dst->bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
+		memcpy(&dst->dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
+		dst->pdata = realloc(dst->pdata, dst->dib_h.image_size);
+		memcpy(dst->pdata, bmp_blank.pdata, dst->dib_h.image_size);
+
+		free(bmp_blank.pdata);
+	} else
+		bmp_h_combin_rl_2(dst, add);
+
+	return dst;
+}
+
+/*
+ * 合并的位图水平分辨率相同才能调用该函数
+ */
+bmp_file_t *
+bmp_v_combin_du_2(bmp_file_t *dst, const bmp_file_t *add)
+{
+	bmp_file_t tmp;
+
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+	} else {
+		memcpy(&tmp, dst, sizeof(bmp_file_t));
+		tmp.pdata = malloc(tmp.dib_h.image_size);
+		memcpy(tmp.pdata, dst->pdata, tmp.dib_h.image_size);
+		dst->pdata = realloc(dst->pdata, dst->dib_h.image_size + add->dib_h.image_size);
+		bmp_v_combin(add, &tmp, dst);
+
+		free(tmp.pdata);
+	}
+	return dst;
+}
+
+/* 
+ * 垂直合并支持水平分辨率不同位图
+ * 水平分辨率较小的位图左边将补齐空白
+ */
+bmp_file_t *
+bmp_v_combin_du_3(bmp_file_t *dst, const bmp_file_t *add, uint32_t blank_color)
+{
+	bmp_file_t tmp_bmp;
+	bmp_file_t blank_bmp;
+	uint32_t w_diff;
+	uint32_t rowsize;
+
+	if (dst->pdata == NULL) {
+		memcpy(dst, add, sizeof(bmp_file_t));
+		dst->pdata = malloc(dst->dib_h.image_size);
+		memcpy(dst->pdata, add->pdata, add->dib_h.image_size);
+		return dst;
+	} 
+	/*
+	 * else 
+	 */
+	if (dst->dib_h.width > add->dib_h.width) {
+		w_diff = dst->dib_h.width - add->dib_h.width;
+
+		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
+		blank_bmp.pdata = malloc(rowsize * add->dib_h.height);
+		create_blank_bmp(&blank_bmp, w_diff, add->dib_h.height, add->dib_h.bits_per_pix, blank_color);
+		memcpy(&tmp_bmp, add, sizeof(tmp_bmp));
+		tmp_bmp.pdata = malloc(tmp_bmp.dib_h.image_size);
+		memcpy(tmp_bmp.pdata, add->pdata, tmp_bmp.dib_h.image_size);
+		bmp_h_combin_2(&tmp_bmp, &blank_bmp);
+		bmp_v_combin_du_2(dst, &tmp_bmp);
+
+		free(tmp_bmp.pdata);
+		free(blank_bmp.pdata);
+	} else if (dst->dib_h.width < add->dib_h.width) {
+		w_diff = add->dib_h.width - dst->dib_h.width;
+		rowsize = (add->dib_h.bits_per_pix * w_diff + 31) / 32 * 4;
+		blank_bmp.pdata = malloc(rowsize * dst->dib_h.height);
+		create_blank_bmp(&blank_bmp, w_diff, dst->dib_h.height, add->dib_h.bits_per_pix, blank_color);
+		bmp_h_combin_2(dst, &blank_bmp);
+		bmp_v_combin_du_2(dst, add);
+
+		free(blank_bmp.pdata);
+	} else
+		bmp_v_combin_du_2(dst, add);
+
+	return dst;
+}

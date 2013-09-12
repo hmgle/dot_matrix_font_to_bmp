@@ -45,8 +45,8 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 		'薄有遗闻琐且劳\n'\
 		'只算初识镜背字\n'\
 		'敢陈法物诂球刀\n'\
-		'  龚自珍' | \
-		./text2bmp -F dazhuanti.hzk -H 32 > testdazhuan.bmp
+		'已亥杂诗龚自珍' | \
+		./text2bmp -e -F dazhuanti.hzk -H 32 > testdazhuan.bmp
 
 ![testdazhuan.bmp](testdazhuan.bmp)
 
