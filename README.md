@@ -50,6 +50,8 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 ![testdazhuan.bmp](testdazhuan.bmp)
 
+**提示**：上面的`dazhuanti.hzk`(大篆体)字库是用`python`写的一个程序[gendotmatrix](https://github.com/hmgle/gendotmatrix)提取出来的。
+
 直接读入文件并生成相应位图：
 
     cat test3.txt
