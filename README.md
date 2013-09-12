@@ -39,20 +39,16 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 ![test2.bmp](test2.bmp)
 
-生成含有多行汉字的位图：
+指定字库文件：
 
+	echo -e '西京别火位非高\n'\
+		'薄有遗闻琐且劳\n'\
+		'只算初识镜背字\n'\
+		'敢陈法物诂球刀\n'\
+		'  龚自珍' | \
+		./text2bmp -F dazhuanti.hzk -H 32 > testdazhuan.bmp
 
-    (./characters2bmp.sh "       " \
-    && ./characters2bmp.sh " 红豆生南国，" \
-    && ./characters2bmp.sh " 春来发几枝？" \
-    && ./characters2bmp.sh " 愿君多采撷，" \
-    && ./characters2bmp.sh " 此物最想思。" \
-    && ./characters2bmp.sh "       " \
-    && ./characters2bmp.sh "   -王维 ") \
-    | ./bmpsallv2bmp > poem.bmp
-
-
-![poem.bmp](poem.bmp)
+![testdazhuan.bmp](testdazhuan.bmp)
 
 直接读入文件并生成相应位图：
 
