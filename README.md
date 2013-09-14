@@ -12,7 +12,7 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 编译生成目标文件：
 
-    make
+    $ make
 
 所生成的文件有：
 * utf8togb2312:	将utf-8编码转换为gb2312编码的程序。
@@ -27,21 +27,21 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 假如你要生成字符串 `字符生成位图测试0x16v1.0.0` 的位图, 执行下面的命令将得到想要的位图, 保存在 `test.bmp`:
 
-    ./characters2bmp.sh "字符生成位图测试0x16v1.0.0" > ./test1.bmp
+    $ ./characters2bmp.sh "字符生成位图测试0x16v1.0.0" > ./test1.bmp
 
 
 ![test1.bmp](test1.bmp)
 
 支持中间混杂了空格， 如：
 
-    ./characters2bmp.sh "后面有3个空格   前面有3个空格" > ./test2.bmp
+    $ ./characters2bmp.sh "后面有3个空格   前面有3个空格" > ./test2.bmp
 
 
 ![test2.bmp](test2.bmp)
 
 指定字库文件：
 
-	echo -e '西京别火位非高\n'\
+	$ echo -e '西京别火位非高\n'\
 		'薄有遗闻琐且劳\n'\
 		'只算初识镜背字\n'\
 		'敢陈法物诂球刀\n'\
@@ -54,7 +54,7 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 直接读入文件并生成相应位图：
 
-    cat test3.txt
+    $ cat test3.txt
     当我们在雨中行驶时，
     我能够看出他逐渐变得有些怏怏不乐。
     我否定的不仅仅是一些错误的说法，
@@ -62,7 +62,7 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
         卡尔.萨根 魔鬼出没的世界
 
-    ./text2bmp -g 0xffff -f 0x0 -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
+    $ ./text2bmp -g 0xffff -f 0x0 -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
 
 
 生成的位图：
