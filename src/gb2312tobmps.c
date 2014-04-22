@@ -46,9 +46,9 @@ int main(int argc, char **argv)
 			color.fg_color = strtol(optarg, NULL, 0);
 			break;
 		default: /* '?' */
-			fprintf(stderr, 
+			fprintf(stderr,
 				"Usage: %s [-d bitdepth(16 or 24)] "
-				"[-c]\n", 
+				"[-c]\n",
 				argv[0]);
 			exit(1);
 		}
@@ -96,13 +96,17 @@ int main(int argc, char **argv)
 	memset(bmp.pdata, 0, bmp.dib_h.image_size);
 	for (;;) {
 		if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
-			offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1], FONTHEIGHT);
+			offset = gb2312code_to_fontoffset(gb2312buf[i] +
+					0x100 * gb2312buf[i + 1], FONTHEIGHT);
 			i += 2;
-			fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, &color);
-		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) { /* ascii */
+			fontdata2bmp(addr_fd_in + offset, 16, 16,
+					&bmp, bits_per_pix, &color);
+		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
+			/* ascii */
 			offset = ascii_to_fontoffset(gb2312buf[i]);
 			i++;
-			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp, bits_per_pix, &color);
+			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16,
+					&bmp, bits_per_pix, &color);
 		} else
 			break;
 
@@ -116,7 +120,8 @@ int main(int argc, char **argv)
 			perror("fwrite");
 			exit(1);
 		}
-		ret = fwrite(bmp.pdata, sizeof(uint8_t), bmp.dib_h.image_size, stdout);
+		ret = fwrite(bmp.pdata, sizeof(uint8_t), bmp.dib_h.image_size,
+				stdout);
 		if (ret < 0) {
 			perror("fwrite");
 			exit(1);

@@ -183,7 +183,7 @@ int main(int argc, char **argv)
 	memset(&bmp_blank, 0, sizeof(bmp_blank));
 	bmp_blank.pdata = malloc(FONT_BMP_SIZE);
 
-	once_read = (style.max_line_length > 0) 
+	once_read = (style.max_line_length > 0)
 			? (style.max_line_length + 1) : (sizeof(linebuf) - 1);
 	if (encoding_type == UTF8_WITH_BOM) {
 		if (fseek(in, 3, SEEK_SET)) {
@@ -191,8 +191,9 @@ int main(int argc, char **argv)
 			exit(errno);
 		}
 	}
-	for(;;) {
-		if (encoding_type == UTF8_NO_BOM || encoding_type == UTF8_WITH_BOM) {
+	for (;;) {
+		if (encoding_type == UTF8_NO_BOM ||
+		    encoding_type == UTF8_WITH_BOM) {
 			if (fgets_utf8((char *)linebuf, once_read, in) == NULL)
 				break;
 			ptr_gb2312 = gb2312buf;
@@ -202,13 +203,15 @@ int main(int argc, char **argv)
 			while (*ptr) {
 				ret = utf8tounicode(ptr, unicode);
 				if (ret < 0) {
-					debug_print("utf8tounicode return %d\n", ret);
+					debug_print("utf8tounicode return %d\n",
+						    ret);
 					exit(1);
 				}
 				ptr += ret;
-				gb2312_code = unicode_to_gb2312(unicode[0] + unicode[1] * 0x100, 
-								mem_addr, 
-								gb2312_num);
+				gb2312_code = unicode_to_gb2312(unicode[0] +
+							unicode[1] * 0x100,
+							mem_addr,
+							gb2312_num);
 				ptr_gb2312[0] = gb2312_code % 0x100;
 				if (gb2312_code / 0x100 > 0) {
 					ptr_gb2312[1] = gb2312_code / 0x100;
@@ -230,18 +233,26 @@ int main(int argc, char **argv)
 		i = 0;
 		for (;;) {
 			if (gb2312buf[i] > 0xA0 && gb2312buf[i]  < 0xff) {
-				offset = gb2312code_to_fontoffset(gb2312buf[i] + 0x100 * gb2312buf[i + 1], font_height);
+				offset = gb2312code_to_fontoffset(gb2312buf[i] +
+						0x100 * gb2312buf[i + 1],
+						font_height);
 				i += 2;
-				set_header(&bmp_char, font_height, font_height, bits_per_pix);
-				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_fd_in + offset, font_height, font_height, &bmp_char, bits_per_pix, &color);
+				set_header(&bmp_char, font_height, font_height,
+					bits_per_pix);
+				memset(bmp_char.pdata, 0,
+					bmp_char.dib_h.image_size);
+				fontdata2bmp(addr_fd_in + offset, font_height,
+						font_height, &bmp_char,
+						bits_per_pix, &color);
 
 			} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
 				offset = ascii_to_fontoffset(gb2312buf[i]);
 				i++;
 				set_header(&bmp_char, 8, 16, bits_per_pix);
-				memset(bmp_char.pdata, 0, bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16, &bmp_char, bits_per_pix, &color);
+				memset(bmp_char.pdata, 0,
+					bmp_char.dib_h.image_size);
+				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16,
+					     &bmp_char, bits_per_pix, &color);
 			} else if (gb2312buf[i] == '\t') {
 				i++;
 				create_blank_bmp(&bmp_char,
@@ -253,19 +264,23 @@ int main(int argc, char **argv)
 				break;
 
 			if (vertical_flag == 0)
-				bmp_h_combin_3(&bmp_line, &bmp_char, color.bg_color);
+				bmp_h_combin_3(&bmp_line, &bmp_char,
+						color.bg_color);
 			else
-				bmp_v_combin_3(&bmp_line, &bmp_char, color.bg_color);
+				bmp_v_combin_3(&bmp_line, &bmp_char,
+						color.bg_color);
 			if (style.character_spacing > 0) {
-				create_blank_bmp(&bmp_blank, 
-						style.character_spacing, 
-						1, 
-						bits_per_pix, 
+				create_blank_bmp(&bmp_blank,
+						style.character_spacing,
+						1,
+						bits_per_pix,
 						color.bg_color);
 				if (vertical_flag == 0)
-					bmp_h_combin_3(&bmp_line, &bmp_blank, color.bg_color);
+					bmp_h_combin_3(&bmp_line, &bmp_blank,
+							color.bg_color);
 				else
-					bmp_v_combin_3(&bmp_line, &bmp_blank, color.bg_color);
+					bmp_v_combin_3(&bmp_line, &bmp_blank,
+							color.bg_color);
 			}
 		} /* for (;;) */
 		if (vertical_flag == 0)
@@ -273,10 +288,10 @@ int main(int argc, char **argv)
 		else
 			bmp_h_combin_rl_3(&bmp_all, &bmp_line, color.bg_color);
 		if (style.line_spacing > 0) {
-			create_blank_bmp(&bmp_blank, 
-					1, 
-					style.line_spacing, 
-					bits_per_pix, 
+			create_blank_bmp(&bmp_blank,
+					1,
+					style.line_spacing,
+					bits_per_pix,
 					color.bg_color);
 			bmp_v_combin_3(&bmp_all, &bmp_blank, color.bg_color);
 		}
@@ -291,42 +306,48 @@ int main(int argc, char **argv)
 	 * 格式处理
 	 */
 	if (style.left_margin > 0) {
-		create_blank_bmp(&bmp_blank, 
-				style.left_margin, 
-				1, 
-				bits_per_pix, 
+		create_blank_bmp(&bmp_blank,
+				style.left_margin,
+				1,
+				bits_per_pix,
 				color.bg_color);
 		bmp_h_combin_3(&bmp_blank, &bmp_all, color.bg_color);
-		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
+		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h,
+			sizeof(bmp_file_header_t));
 		memcpy(&bmp_all.dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
-		bmp_all.pdata = realloc(bmp_all.pdata, bmp_all.dib_h.image_size);
-		memcpy(bmp_all.pdata, bmp_blank.pdata, bmp_all.dib_h.image_size);
+		bmp_all.pdata = realloc(bmp_all.pdata,
+					bmp_all.dib_h.image_size);
+		memcpy(bmp_all.pdata, bmp_blank.pdata,
+			bmp_all.dib_h.image_size);
 	}
 	if (style.right_margin > 0) {
-		create_blank_bmp(&bmp_blank, 
-				style.right_margin, 
-				1, 
-				bits_per_pix, 
+		create_blank_bmp(&bmp_blank,
+				style.right_margin,
+				1,
+				bits_per_pix,
 				color.bg_color);
 		bmp_h_combin_3(&bmp_all, &bmp_blank, color.bg_color);
 	}
 	if (style.up_margin > 0) {
-		create_blank_bmp(&bmp_blank, 
-				1, 
-				style.up_margin, 
-				bits_per_pix, 
+		create_blank_bmp(&bmp_blank,
+				1,
+				style.up_margin,
+				bits_per_pix,
 				color.bg_color);
 		bmp_v_combin_3(&bmp_blank, &bmp_all, color.bg_color);
-		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h, sizeof(bmp_file_header_t));
+		memcpy(&bmp_all.bmp_h, &bmp_blank.bmp_h,
+			sizeof(bmp_file_header_t));
 		memcpy(&bmp_all.dib_h, &bmp_blank.dib_h, sizeof(dib_header_t));
-		bmp_all.pdata = realloc(bmp_all.pdata, bmp_all.dib_h.image_size);
-		memcpy(bmp_all.pdata, bmp_blank.pdata, bmp_all.dib_h.image_size);
+		bmp_all.pdata = realloc(bmp_all.pdata,
+					bmp_all.dib_h.image_size);
+		memcpy(bmp_all.pdata, bmp_blank.pdata,
+				bmp_all.dib_h.image_size);
 	}
 	if (style.down_margin > 0) {
-		create_blank_bmp(&bmp_blank, 
-				1, 
-				style.down_margin, 
-				bits_per_pix, 
+		create_blank_bmp(&bmp_blank,
+				1,
+				style.down_margin,
+				bits_per_pix,
 				color.bg_color);
 		bmp_v_combin_3(&bmp_all, &bmp_blank, color.bg_color);
 	}
