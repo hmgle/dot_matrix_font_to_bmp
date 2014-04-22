@@ -7,7 +7,7 @@
 
 static inline uint8_t hex_ch_to_val(char hex_ch);
 
-int 
+int
 get_utf8_length(const uint8_t *src)
 {
 	switch (*src) {
@@ -36,7 +36,7 @@ utf8tounicode(const uint8_t *src, uint8_t *dst)
 	switch (length) {
 	case 1:
 		*dst = *src;
-		*(dst + 1) = 0; /* 经测试，若不加该句，dst+1里面的值会变成0x5b */
+		*(dst + 1) = 0;
 		return 1;
 		break;
 	case 2:
@@ -132,17 +132,17 @@ unicode_to_gb2312(uint16_t unicode, const uint16_t *mem_gb2312, int gb2312_num)
 	if (mem_gb2312[2 * i] == unicode)
 		return mem_gb2312[2 * i + 1];
 	else if (mem_gb2312[2 * i] < unicode)
-		return unicode_to_gb2312(unicode, 
-					 &mem_gb2312[2 * i + 2], 
+		return unicode_to_gb2312(unicode,
+					 &mem_gb2312[2 * i + 2],
 					 gb2312_num - i - 1);
 	else /* mem_gb2312[2 * i] > unicode */
-		return unicode_to_gb2312(unicode, 
-					 mem_gb2312, 
+		return unicode_to_gb2312(unicode,
+					 mem_gb2312,
 					 i);
 #endif
 }
 
-static inline uint8_t 
+static inline uint8_t
 hex_ch_to_val(char hex_ch)
 {
 	if (hex_ch >= '0' && hex_ch <= '9')
@@ -184,20 +184,20 @@ mem_gb2312(const char *gb2312filename, int *gb2312_num)
 		ptrch++;
 		*(ptrmem + i * 2) =  hex_ch_to_val(ptrch[0]) * 0x1000
 				    + hex_ch_to_val(ptrch[1]) * 0x100
-				    + hex_ch_to_val(ptrch[2]) * 0x10 
+				    + hex_ch_to_val(ptrch[2]) * 0x10
 				    + hex_ch_to_val(ptrch[3]);
 
 		/* gb2312 */
 		ptrch = strstr(ptrch, "/x");
 		ptrch += 2;
 		if (ptrch[2] != '/') { /* 单字节 */
-			*(ptrmem + i * 2 + 1) = hex_ch_to_val(ptrch[1])
-						+ hex_ch_to_val(ptrch[0]) * 0x10;
+			*(ptrmem + i * 2 + 1) = hex_ch_to_val(ptrch[1]) +
+						hex_ch_to_val(ptrch[0]) * 0x10;
 		} else { /* 两个字节 */
 			*(ptrmem + i * 2 + 1) = hex_ch_to_val(ptrch[5]) * 0x100
-						+ hex_ch_to_val(ptrch[4]) * 0x1000
-						+ hex_ch_to_val(ptrch[1])
-						+ hex_ch_to_val(ptrch[0]) * 0x10;
+					+ hex_ch_to_val(ptrch[4]) * 0x1000
+					+ hex_ch_to_val(ptrch[1])
+					+ hex_ch_to_val(ptrch[0]) * 0x10;
 		}
 		i++;
 	} /* i should be 7573 */

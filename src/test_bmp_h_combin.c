@@ -37,8 +37,8 @@ int main(int argc, char **argv)
 			bits_per_pix = atoi(optarg);
 			break;
 		default: /* '?' */
-			fprintf(stderr, 
-				"Usage: %s [-d bitdepth(16 or 24)]\n", 
+			fprintf(stderr,
+				"Usage: %s [-d bitdepth(16 or 24)]\n",
 				argv[0]);
 			exit(1);
 		}
@@ -63,7 +63,8 @@ int main(int argc, char **argv)
 	}
 
 	/* debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[0]); */
-	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[0], FONTHEIGHT);
+	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[0],
+			FONTHEIGHT);
 	/* debug_print("offset = %#x", offset); */
 	memset(&bmp, 0, sizeof(bmp));
 	set_header(&bmp, 16, 16, bits_per_pix);
@@ -73,7 +74,8 @@ int main(int argc, char **argv)
 	fontdata2bmp(addr_fd_in + offset, 16, 16, &bmp, bits_per_pix, 0);
 
 	/* debug_print("gb2312buf[0] = %#x", ((uint16_t *)gb2312buf)[1]); */
-	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[1], FONTHEIGHT);
+	offset = gb2312code_to_fontoffset(((uint16_t *)gb2312buf)[1],
+					FONTHEIGHT);
 	/* debug_print("offset = %#x", offset); */
 	memset(&bmp2, 0, sizeof(bmp2));
 	set_header(&bmp2, 16, 16, bits_per_pix);
@@ -85,12 +87,11 @@ int main(int argc, char **argv)
 	/* debug_print("will memset bmp_all"); */
 
 	memset(&bmp_all, 0, sizeof(bmp_all));
-	set_header(&bmp_all, 
+	set_header(&bmp_all,
 		   bmp.dib_h.width + bmp2.dib_h.width,
 		   bmp.dib_h.height,
 		   bmp.dib_h.bits_per_pix);
 	bmp_all.pdata = malloc(bmp_all.dib_h.image_size);
-	/* debug_print("bmp_all.dib_h.image_size is %d", bmp_all.dib_h.image_size); */
 	/* debug_print("bmp_all.pdata is %#x", bmp_all.pdata); */
 	bmp_h_combin(&bmp, &bmp2, &bmp_all);
 
@@ -143,7 +144,8 @@ int main(int argc, char **argv)
 		perror("fwrite");
 		exit(1);
 	}
-	ret = fwrite(bmp_all.pdata, sizeof(uint8_t), bmp_all.dib_h.image_size, stderr);
+	ret = fwrite(bmp_all.pdata, sizeof(uint8_t), bmp_all.dib_h.image_size,
+			stderr);
 	if (ret < 0) {
 		perror("fwrite");
 		exit(1);

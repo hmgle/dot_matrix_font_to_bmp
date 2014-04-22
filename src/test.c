@@ -1,6 +1,6 @@
 /*
- * for example: 
- * 汉字“度”的gb2312 EUC-CN 编码为0xB6C8, 
+ * for example:
+ * 汉字“度”的gb2312 EUC-CN 编码为0xB6C8,
  * 16*16字库gb2312.hzk, 要生成“度”的24位的位图，输入：
  * ./test ./gb2312.hzk 0xb6c8 ./b6c8.bmp 24
  */
@@ -17,7 +17,8 @@ void show_usage(char *thisname);
 
 void show_usage(char *thisname)
 {
-	printf("usage: %s <font_repo> <addr> <outbmp> <bit_per_pix>\n", thisname);
+	printf("usage: %s <font_repo> <addr> <outbmp> <bit_per_pix>\n",
+		thisname);
 }
 
 int main(int argc, char **argv)
