@@ -54,16 +54,16 @@ dot_matrix_font_to_bmp 在 MIT license协议下发布。参见[LICENSE.md](LICEN
 
 直接读入文件并生成相应位图：
 
-    $ cat test3.txt
-    当我们在雨中行驶时，
-    我能够看出他逐渐变得有些怏怏不乐。
-    我否定的不仅仅是一些错误的说法，
-    而是他内心生活中蕴藏着的宝贵的东西。
+```console
+$ cat test3.txt
+当我们在雨中行驶时，
+我能够看出他逐渐变得有些怏怏不乐。
+我否定的不仅仅是一些错误的说法，
+而是他内心生活中蕴藏着的宝贵的东西。
 
-        卡尔.萨根 魔鬼出没的世界
-
-    $ ./text2bmp -g 0xffff -f 0x0 -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
-
+    卡尔.萨根 魔鬼出没的世界
+$ ./text2bmp -g 0xffff -f 0x0 -c 2 -u 16 -d 8 -l 16 -r 8 -i 8 test3.txt > test3.bmp
+```
 
 生成的位图：
 
