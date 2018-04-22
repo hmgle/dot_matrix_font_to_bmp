@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <linux/limits.h>
+#include <limits.h>
 #include "dot_matrix_font_to_bmp.h"
 #include "encoding_convert.h"
 #include "encoding_detect.h"
