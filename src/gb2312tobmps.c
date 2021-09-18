@@ -99,13 +99,13 @@ int main(int argc, char **argv)
 			offset = gb2312code_to_fontoffset(gb2312buf[i] +
 					0x100 * gb2312buf[i + 1], FONTHEIGHT);
 			i += 2;
-			fontdata2bmp(addr_fd_in + offset, 16, 16,
+			fontdata2bmp(addr_fd_in + offset % fd_stat.st_size, 16, 16,
 					&bmp, bits_per_pix, &color);
 		} else if (gb2312buf[i] > 0x1f && gb2312buf[i] < 0x80) {
 			/* ascii */
 			offset = ascii_to_fontoffset(gb2312buf[i]);
 			i++;
-			fontdata2bmp(addr_ascii_fd_in + offset, 8, 16,
+			fontdata2bmp(addr_ascii_fd_in + offset % ascii_fd_stat.st_size, 8, 16,
 					&bmp, bits_per_pix, &color);
 		} else
 			break;

@@ -241,7 +241,7 @@ int main(int argc, char **argv)
 					bits_per_pix);
 				memset(bmp_char.pdata, 0,
 					bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_fd_in + offset, font_height,
+				fontdata2bmp(addr_fd_in + offset % fd_stat.st_size, font_height,
 						font_height, &bmp_char,
 						bits_per_pix, &color);
 
@@ -251,7 +251,7 @@ int main(int argc, char **argv)
 				set_header(&bmp_char, 8, 16, bits_per_pix);
 				memset(bmp_char.pdata, 0,
 					bmp_char.dib_h.image_size);
-				fontdata2bmp(addr_ascii_fd_in + offset, 8, 16,
+				fontdata2bmp(addr_ascii_fd_in + offset % ascii_fd_stat.st_size, 8, 16,
 					     &bmp_char, bits_per_pix, &color);
 			} else if (gb2312buf[i] == '\t') {
 				i++;
